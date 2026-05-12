@@ -15,7 +15,6 @@ import {
   Target,
   Zap,
   ShieldCheck,
-  BookOpen,
   Users,
   Download,
   Wrench,

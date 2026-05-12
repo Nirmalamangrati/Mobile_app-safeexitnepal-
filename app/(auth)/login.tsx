@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Mail, Lock, ChevronRight } from "lucide-react-native";
+import { useRouter } from "expo-router";
 
-// 1. TypeScript ko lagi Interface define gareko
-interface LoginFormProps {
-  onToggleSignup: () => void;
-}
-
-const LoginForm = ({ onToggleSignup }: LoginFormProps) => {
+const LoginForm = () => {
+  const router = useRouter();
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
 
@@ -15,12 +12,10 @@ const LoginForm = ({ onToggleSignup }: LoginFormProps) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10}$/;
 
-    if (emailRegex.test(contact)) {
-      Alert.alert("Success", "Verified Email: " + contact);
-    } else if (phoneRegex.test(contact)) {
-      Alert.alert("Success", "Verified Phone: " + contact);
+    if (emailRegex.test(contact) || phoneRegex.test(contact)) {
+      router.replace("/(tabs)/home");
     } else {
-      Alert.alert("Error", "Valid email or 10-digit phone number halnuhos.");
+      Alert.alert("Error", "कृपया सही इमेल वा १० अंकको फोन नम्बर हाल्नुहोस्।");
     }
   };
 
@@ -33,7 +28,7 @@ const LoginForm = ({ onToggleSignup }: LoginFormProps) => {
         </Text>
       </View>
 
-      {/* Email/Phone Input */}
+      {/* Input: Email or Phone */}
       <View className="bg-[#1e293b] flex-row items-center p-4 rounded-2xl mb-4 border border-white/5">
         <Mail color="#60a5fa" size={20} />
         <TextInput
@@ -47,7 +42,7 @@ const LoginForm = ({ onToggleSignup }: LoginFormProps) => {
         />
       </View>
 
-      {/* Password Input */}
+      {/* Input: Password */}
       <View className="bg-[#1e293b] flex-row items-center p-4 rounded-2xl mb-6 border border-white/5">
         <Lock color="#60a5fa" size={20} />
         <TextInput
@@ -69,8 +64,10 @@ const LoginForm = ({ onToggleSignup }: LoginFormProps) => {
         <ChevronRight color="white" size={20} />
       </TouchableOpacity>
 
-      {/* Switch to Signup - Yahan toggle logic chha */}
-      <TouchableOpacity onPress={onToggleSignup} className="mt-6">
+      <TouchableOpacity
+        onPress={() => router.push("/(auth)/signupForm")}
+        className="mt-6"
+      >
         <Text className="text-gray-400 text-center">
           Do not have an account?{" "}
           <Text className="text-blue-500 font-bold">Sign Up</Text>
