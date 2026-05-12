@@ -42,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: "Map",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="map" size={24} color={color} />
+            <Ionicons name="location" size={24} color={color} />
           ),
         }}
       />

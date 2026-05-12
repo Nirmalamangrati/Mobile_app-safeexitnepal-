@@ -1,9 +1,18 @@
-import { View, Text } from "react-native";
+import React, { useState } from "react";
+import { View } from "react-native";
+import LoginForm from "./login";
+import SignupForm from "./signupForm";
 
 export default function Profile() {
+  const [showSignup, setShowSignup] = useState(false);
+
   return (
-    <View>
-      <Text>Profile Screen</Text>
+    <View className="flex-1">
+      {showSignup ? (
+        <SignupForm onToggle={() => setShowSignup(false)} />
+      ) : (
+        <LoginForm onToggleSignup={() => setShowSignup(true)} />
+      )}
     </View>
   );
 }

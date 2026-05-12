@@ -7,7 +7,21 @@ import {
   TextInput,
   Modal,
 } from "react-native";
-import { Shield, MapPin, X } from "lucide-react-native";
+import {
+  Shield,
+  MapPin,
+  X,
+  AlertTriangle,
+  Target,
+  Zap,
+  ShieldCheck,
+  BookOpen,
+  Users,
+  Download,
+  Wrench,
+  BarChart2,
+  PlayCircle,
+} from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
 export default function HomeScreen() {
   const [language, setLanguage] = useState("en");
@@ -105,7 +119,7 @@ export default function HomeScreen() {
       {/* BODY */}
       <View className="p-4">
         {/* SOS */}
-        <View className="items-center mb-6">
+        <View className="items-center mb-4">
           <TouchableOpacity className="bg-red-600 px-8 py-4 rounded-full flex-row items-center">
             <Ionicons name="alert-circle" size={22} color="white" />
             <Text className="text-white text-lg font-bold ml-2">
@@ -115,33 +129,36 @@ export default function HomeScreen() {
         </View>
 
         {/* LOCATION */}
-        <View className="bg-[#0f172a] flex-row items-center p-3 rounded-xl mb-6">
+        <View className="bg-[#0f172a] flex-row items-center p-3 rounded-xl mb-4 h-12">
           <MapPin color="#60a5fa" size={20} />
           <TextInput
             placeholder={t.location}
             placeholderTextColor="#94a3b8"
-            className="flex-1 text-white ml-2"
+            className="flex-1 text-white ml-2 h-10"
           />
         </View>
 
         {/* STATUS CARDS */}
-        <View className="flex-row flex-wrap justify-between mb-6">
+        <View className="flex-row flex-wrap justify-between mb-0">
           {[
-            {
-              title: t.critical,
-              color: "bg-red-600",
-              colorIcon: "white",
-            },
-            { title: t.high, color: "bg-orange-500" },
-            { title: t.medium, color: "bg-yellow-500" },
-            { title: t.low, color: "bg-green-600" },
+            { title: t.critical, color: "bg-red-600", icon: AlertTriangle },
+            { title: t.high, color: "bg-orange-500", icon: Target },
+            { title: t.medium, color: "bg-yellow-500", icon: Zap },
+            { title: t.low, color: "bg-green-600", icon: ShieldCheck },
           ].map((item, i) => (
             <View
               key={i}
-              className={`w-[48%] p-4 rounded-xl mb-3 ${item.color}`}
+              className={`w-[48%] h-15 p-3 rounded-lg mb-3 flex-row justify-between items-center ${item.color}`}
             >
-              <Text className="text-white">{item.title}</Text>
-              <Text className="text-white text-3xl font-bold mt-2">0</Text>
+              <View>
+                <Text className="text-white text-xs font-bold opacity-90">
+                  {item.title}
+                </Text>
+                <Text className="text-white text-xl font-bold">0</Text>
+              </View>
+              <View className="opacity-30">
+                <item.icon color="white" size={24} />
+              </View>
             </View>
           ))}
         </View>
@@ -161,22 +178,120 @@ export default function HomeScreen() {
         </View>
 
         {/* FEATURE CARDS */}
-        {[
-          { title: t.findShelters, desc: t.sheltersDesc },
-          { title: t.communitySafety, desc: t.communityDesc },
-          { title: t.rescueTeams, desc: t.rescueDesc },
-          { title: t.offlineResources, desc: t.offlineDesc },
-        ].map((item, i) => (
-          <View
-            key={i}
-            className="bg-[#0f172a] p-4 rounded-xl mb-4 border border-[#1e293b]"
-          >
-            <Text className="text-white text-lg font-bold mb-1">
-              {item.title}
-            </Text>
-            <Text className="text-gray-400">{item.desc}</Text>
-          </View>
-        ))}
+        <View className="flex-row flex-wrap justify-between">
+          {[
+            {
+              title: t.findShelters,
+              desc: t.sheltersDesc,
+              icon: MapPin,
+              location: "Naya Bazaar Shelter",
+              dist: "0.5 km",
+            },
+            {
+              title: t.rescueTeams,
+              desc: t.rescueDesc,
+              icon: Users,
+              location: "Pokhara City Hall",
+              dist: "1.2 km",
+            },
+            { title: t.communitySafety, desc: t.communityDesc, icon: Shield },
+            { title: "Offline Resources", isOffline: true },
+          ].map((item, i) => {
+            const IconComponent = item.icon;
+            return (
+              <View
+                key={i}
+                className="w-[48.5%] bg-[#1e293b]/50 rounded-2xl mb-4 border border-white/5 overflow-hidden"
+              >
+                <View className="p-3">
+                  <View className="flex-row items-center mb-1">
+                    {IconComponent && (
+                      <IconComponent
+                        size={14}
+                        color={item.isOffline ? "#22c55e" : "#60a5fa"}
+                      />
+                    )}
+                    <Text
+                      className="text-white text-[11px] font-bold ml-2"
+                      numberOfLines={1}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+                  <Text className="text-gray-400 text-[9px]" numberOfLines={1}>
+                    {item.desc || "Important data cached."}
+                  </Text>
+                </View>
+                <View className="px-2 pb-2">
+                  {item.isOffline ? (
+                    <View className="bg-[#0f172a]/60 p-2 rounded-xl">
+                      <View className="flex-row flex-wrap justify-between">
+                        {[
+                          {
+                            title: "Download maps",
+                            icon: Download,
+                            color: "#22c55e",
+                          },
+                          {
+                            title: "Mesh networking tools",
+                            icon: Wrench,
+                            color: "#3b82f6",
+                          },
+                          {
+                            title: "Emergency Procedures",
+                            icon: BarChart2,
+                            color: "#f59e0b",
+                          },
+                          {
+                            title: "First Aid Guides",
+                            icon: PlayCircle,
+                            color: "#ef4444",
+                          },
+                        ].map((res, idx) => (
+                          <View
+                            key={idx}
+                            className="w-[45%] items-center my-1.5"
+                          >
+                            <res.icon color={res.color} size={18} />
+                            <Text className="text-white text-[8px] mt-1">
+                              {res.title}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  ) : (
+                    <View>
+                      <View className="h-20 bg-gray-700 rounded-lg items-center justify-center">
+                        <Text className="text-gray-500 text-[10px]">
+                          Map View
+                        </Text>
+                      </View>
+                      <View className="mt-2 h-8">
+                        {item.location && (
+                          <View className="flex-row justify-between items-center">
+                            <Text
+                              className="text-white text-[8px] flex-1"
+                              numberOfLines={1}
+                            >
+                              📍 {item.location}
+                            </Text>
+                            <Text className="text-gray-400 text-[8px]">
+                              ({item.dist})
+                            </Text>
+                          </View>
+                        )}
+                        <Text className="text-orange-400 text-[8px] font-medium mt-1">
+                          Capacity: 70% Full
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                </View>
+              </View>
+            );
+          })}
+        </View>
 
         {/* REPORT BUTTON */}
         <TouchableOpacity
