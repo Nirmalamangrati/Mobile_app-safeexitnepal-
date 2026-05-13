@@ -81,7 +81,7 @@ const LoginForm = () => {
             "OTP has been sent to your contact. Please check.",
           );
           router.push({
-            pathname: "/verifyOtp",
+            pathname: "/(auth)/verifyOtp",
             params: { contact: contact },
           } as any);
         } else {

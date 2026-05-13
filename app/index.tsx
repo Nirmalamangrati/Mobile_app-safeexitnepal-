@@ -1,5 +1,14 @@
 import { Redirect } from "expo-router";
+import React from "react";
 
-export default function EntryPoint() {
-  return <Redirect href="/(auth)/login" />;
-}
+const EntryPoint = () => {
+  const isUserLoggedIn = false;
+
+  if (isUserLoggedIn) {
+    return <Redirect href={"/home" as any} />;
+  } else {
+    return <Redirect href={"/(auth)/login" as any} />;
+  }
+};
+
+export default EntryPoint;

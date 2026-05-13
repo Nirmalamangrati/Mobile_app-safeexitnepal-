@@ -42,7 +42,7 @@ const SafeExitSignup = () => {
   // Emergency Contact Input
   const [newContactName, setNewContactName] = useState("");
   const [newContactPhone, setNewContactPhone] = useState("");
-
+  const [newContactRelationship, setNewContactRelationship] = useState("");
   // Main Form Data
   const [formData, setFormData] = useState({
     fullName: "",
@@ -53,20 +53,12 @@ const SafeExitSignup = () => {
     gender: "Male",
     dob: "",
 
-    emergencyContacts: [
-      {
-        name: "Mother",
-        relationship: "Family",
-        phone: "9812345678",
-        primary: true,
-      },
-      {
-        name: "Brother",
-        relationship: "Family",
-        phone: "9841234567",
-        primary: false,
-      },
-    ],
+    emergencyContacts: [] as {
+      name: string;
+      relationship: string;
+      phone: string;
+      primary: boolean;
+    }[],
 
     safetyInfo: {
       bloodGroup: "",
@@ -100,13 +92,20 @@ const SafeExitSignup = () => {
 
   // Add Contact
   const handleAddContact = () => {
-    if (!newContactName.trim() || !newContactPhone.trim()) {
-      return Alert.alert("Error", "Please enter both name and phone number.");
+    if (
+      !newContactName.trim() ||
+      !newContactPhone.trim() ||
+      !newContactRelationship.trim()
+    ) {
+      return Alert.alert(
+        "Error",
+        "Please enter name, phone number and relationship.",
+      );
     }
 
     const newContact = {
       name: newContactName.trim(),
-      relationship: "Friend",
+      relationship: newContactRelationship.trim(),
       phone: newContactPhone.trim(),
       primary: formData.emergencyContacts.length === 0,
     };
@@ -118,6 +117,7 @@ const SafeExitSignup = () => {
 
     setNewContactName("");
     setNewContactPhone("");
+    setNewContactRelationship("");
   };
 
   // Remove Contact
@@ -458,7 +458,12 @@ const SafeExitSignup = () => {
                     onChangeText={setNewContactName}
                     className="border-b border-gray-200 py-2 mb-3 text-sm"
                   />
-
+                  <TextInput
+                    placeholder="Relationship (e.g. Mother, Friend, Brother)"
+                    value={newContactRelationship}
+                    onChangeText={setNewContactRelationship}
+                    className="border-b border-gray-200 py-2 mb-3 text-sm"
+                  />
                   <TextInput
                     placeholder="Phone Number"
                     keyboardType="phone-pad"

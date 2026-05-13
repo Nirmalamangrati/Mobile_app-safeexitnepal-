@@ -1,27 +1,24 @@
-import { Stack, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import "@/global.css";
-import Profile from "./(tabs)/profile";
+import { Stack } from "expo-router";
+import React from "react";
+import { StatusBar } from "react-native";
 
 export default function RootLayout() {
-  const router = useRouter();
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    setIsReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (isReady) {
-      router.replace("/(auth)/login");
-    }
-  }, [isReady]);
-
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="index" />
-    </Stack>
+    <>
+      <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
+
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: "#0f172a" },
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)/login" />
+        <Stack.Screen name="(auth)/verifyOtp" />
+        <Stack.Screen name="(auth)/signupForm" />
+        <Stack.Screen name="home" />
+      </Stack>
+    </>
   );
 }
