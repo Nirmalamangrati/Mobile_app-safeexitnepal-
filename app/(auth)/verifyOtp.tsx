@@ -1,7 +1,15 @@
-import React, { useState, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ArrowRight, ArrowLeft } from "lucide-react-native";
+import { ArrowRight, ArrowLeft, RotateCcw } from "lucide-react-native";
 
 const BASE_URL = "http://192.168.43.132:8000";
 
@@ -9,39 +17,71 @@ const VerifyOtpForm = () => {
   const router = useRouter();
   const { contact } = useLocalSearchParams<{ contact: string }>();
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const [timer, setTimer] = useState<number>(60);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [resending, setResending] = useState<boolean>(false);
   const inputs = useRef<any[]>([]);
 
-  /**
-   * 1. ALGORITHM: LINEAR SCAN & INDEX-BASED FOCUS SHIFT
-   * Processes data entry one character at a time. It matches the current text index
-   * and automatically executes a forward or backward focus operation on the adjacent element.
-   */
+  useEffect(() => {
+    if (timer === 0) return;
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timer]);
+  //ALGORITHM: LINEAR SCAN & INDEX-BASED FOCUS SHIFT
   const handleOtpChange = (text: string, index: number) => {
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
 
-    // Forward Scan: Shift focus to next cell if character is inputted
     if (text && index < 5) {
       inputs.current[index + 1].focus();
     }
   };
 
   const handleKeyPress = (e: any, index: number) => {
-    // Backward Scan: Shift focus back if user hits delete/backspace on an empty input
     if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
       inputs.current[index - 1].focus();
     }
   };
 
-  const handleVerify = async () => {
-    // Array join operation to compress individual index strings into a single token
-    const fullOtp = otp.join("");
+  const handleResendOtp = async () => {
+    setResending(true);
+    try {
+      const response = await fetch(`${BASE_URL}/resend-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: contact }),
+      });
 
-    /**
-     * 2. ALGORITHM: DETERMINISTIC LENGTH VALIDATION (REGEX)
-     * Performs a standard integrity check evaluating exact numeric sequence match.
-     */
+      if (response.ok) {
+        Alert.alert("Success", "A new OTP has been sent.");
+        setOtp(["", "", "", "", "", ""]);
+        setTimer(60);
+        if (inputs.current && inputs.current[0]) {
+          inputs.current[0].focus();
+        }
+      } else {
+        Alert.alert("Error", "Failed to resend OTP. Please try again.");
+      }
+    } catch (error) {
+      Alert.alert("Network Error", "Unable to reach server.");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const handleVerify = async () => {
+    if (timer === 0) {
+      return Alert.alert(
+        "Code Expired",
+        "The 1-minute window has closed. Please click 'Resend OTP' to get a new code.",
+      );
+    }
+
+    const fullOtp = otp.join("");
+    //ALGORITHM: DETERMINISTIC LENGTH VALIDATION (REGEX)
     const otpRegex = /^[0-9]{6}$/;
 
     if (!otpRegex.test(fullOtp)) {
@@ -51,6 +91,7 @@ const VerifyOtpForm = () => {
       );
     }
 
+    setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/api/auth/verify-otp`, {
         method: "POST",
@@ -61,10 +102,11 @@ const VerifyOtpForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert("Verified ", "Login successful!", [
+        await AsyncStorage.setItem("userToken", data.token);
+        await AsyncStorage.setItem("userData", JSON.stringify(data.user));
+        Alert.alert("Verified", "Login successful!", [
           {
             text: "Continue",
-            // Fixed: Routes directly to the tab layout home dashboard
             onPress: () => router.push("/(tabs)/home" as any),
           },
         ]);
@@ -73,6 +115,8 @@ const VerifyOtpForm = () => {
       }
     } catch (error) {
       Alert.alert("Network Error", "Unable to connect to the server.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,7 +144,7 @@ const VerifyOtpForm = () => {
       </View>
 
       {/* Grid containing 6 distinct input elements */}
-      <View className="flex-row justify-between mb-8 px-2">
+      <View className="flex-row justify-between mb-4 px-2">
         {otp.map((digit, idx) => (
           <TextInput
             key={idx}
@@ -114,15 +158,47 @@ const VerifyOtpForm = () => {
           />
         ))}
       </View>
+      <View className="items-center mb-8h-6 justify-center">
+        {timer > 0 ? (
+          <Text className="text-gray-400">
+            Resend code in{" "}
+            <Text className="text-white font-bold">{timer}s</Text>
+          </Text>
+        ) : (
+          <TouchableOpacity
+            onPress={handleResendOtp}
+            disabled={resending}
+            className="flex-row items-center"
+          >
+            {resending ? (
+              <ActivityIndicator size="small" color="#b91c1c" />
+            ) : (
+              <>
+                <RotateCcw color="#b91c1c" size={16} />
+                <Text className="text-[#b91c1c] ml-2 font-semibold">
+                  Resend OTP
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* Confirm Action Trigger Button */}
       <TouchableOpacity
         onPress={handleVerify}
-        style={{ backgroundColor: "#b91c1c" }}
-        className="p-4 rounded-2xl flex-row justify-between items-center px-6 shadow-lg shadow-red-900/30"
+        disabled={loading || timer === 0}
+        style={{ backgroundColor: timer === 0 ? "#475569" : "#b91c1c" }}
+        className="p-4 rounded-2xl flex-row justify-between items-center px-6 shadow-lg"
       >
         <View className="flex-1 items-center">
-          <Text className="text-white font-bold text-lg">Verify & Proceed</Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white font-bold text-lg">
+              {timer === 0 ? "Code Expired" : "Verify & Proceed"}
+            </Text>
+          )}
         </View>
         <ArrowRight color="white" size={20} />
       </TouchableOpacity>
