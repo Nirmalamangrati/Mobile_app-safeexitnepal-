@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   User,
@@ -51,22 +51,24 @@ const ProfileScreen = () => {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [menuVisible, setMenuVisible] = useState(false);
-  useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const storedData = await AsyncStorage.getItem("userData");
-        if (storedData) {
-          setUser(JSON.parse(storedData));
+  useFocusEffect(
+    useCallback(() => {
+      const loadUserData = async () => {
+        try {
+          const storedData = await AsyncStorage.getItem("userData");
+          if (storedData) {
+            setUser(JSON.parse(storedData));
+          }
+        } catch (error) {
+          console.error("Failed to load user data:", error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Failed to load user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    loadUserData();
-  }, []);
+      loadUserData();
+    }, []),
+  );
 
   const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to log out from SafeExit?", [
@@ -125,8 +127,24 @@ const ProfileScreen = () => {
       <View className="bg-[#1e293b] pt-16 pb-8 px-6 rounded-b-[32px] items-center border-b border-white/5 shadow-xl relative z-50">
         <View className="relative mb-4 z-50">
           <TouchableOpacity
-            onPress={() => setMenuVisible(!menuVisible)}
-            className="active:scale-95 relative"
+            onPress={() => {
+              router.push({
+                pathname: "/profile/edit",
+                params: {
+                  currentName: user?.fullName || "",
+                  currentPhone: user?.phone || "",
+                  currentDob: user?.dob || "",
+                  currentAddress: user?.address || "",
+                  currentGender: user?.gender || "",
+                  currentEmail: user?.email || "",
+                  currentBloodGroup: user?.bloodGroup || "",
+                  currentEmergencyContacts: user?.emergencyContacts
+                    ? JSON.stringify(user.emergencyContacts)
+                    : "",
+                },
+              });
+            }}
+            className="flex-row items-center bg-slate-800/50 px-4 py-2 rounded-full border border-white/10"
           >
             <View className="w-24 h-24 bg-[#b91c1c]/10 border-2 border-[#b91c1c] rounded-full items-center justify-center shadow-lg">
               <Text className="text-white text-3xl font-black">
