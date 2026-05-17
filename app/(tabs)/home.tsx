@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,10 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
+import * as Location from "expo-location";
 import {
   Shield,
   MapPin,
@@ -25,13 +28,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default function HomeScreen() {
   const [language, setLanguage] = useState("en");
   const [showReportForm, setShowReportForm] = useState(false);
-
-  const [formData, setFormData] = useState({
-    type: "fire",
-    latitude: "27.7172",
-    longitude: "85.3240",
-    description: "Fire affected area",
-  });
+  const [sosLoading, setSosLoading] = useState(false);
   const translations = {
     en: {
       title: "SafeExit Nepal",
@@ -92,6 +89,81 @@ export default function HomeScreen() {
   };
 
   const t = translations[language];
+  const BASE_URL = "http://192.168.43.132:8000";
+  const currentUserId = "6644bc231f23ab0017f8a91c";
+  useEffect(() => {
+    // 1. ALGORITHM: PERMISSION CHECK + PROMPT
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Location access is required to use the SOS feature. Please enable it in settings.",
+        );
+      }
+    })();
+  }, []);
+
+  //SoOS BUTTON LOGIC
+  const handleSOSPress = async () => {
+    Alert.alert(
+      "TRIGGER EMERGENCY SOS?",
+      "Are you sure you want to send an SOS alert to your emergency contacts and authorities? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "YES, SEND SOS",
+          style: "destructive",
+          onPress: async () => {
+            setSosLoading(true);
+            try {
+              // 1. ALGORITHM: GEOFENCING + GPS COORDINATE EXTRACTION
+              let currentPosition = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.High,
+              });
+
+              const { latitude, longitude } = currentPosition.coords;
+              console.log("GPS Coordinates Pulled:", latitude, longitude);
+
+              const payload = {
+                userId: currentUserId,
+                location: {
+                  lat: latitude,
+                  lng: longitude,
+                },
+              };
+
+              // calling backend API to trigger SOS
+              const response = await fetch(`${BASE_URL}/api/user/trigger`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+
+              const data = await response.json();
+
+              if (response.ok) {
+                Alert.alert(
+                  " SOS ACTIVATED",
+                  "Your emergency contacts have been sent an alarm notification. If no one responds within 30 seconds, the Nepal Police and admin will be automatically alerted.",
+                );
+              } else {
+                Alert.alert("Error", data.error || "SOS trigger failed.");
+              }
+            } catch (error) {
+              console.log("SOS Activation Error:", error);
+              Alert.alert(
+                "Network Error",
+                "backend can not be connect with server. Please try again later.",
+              );
+            } finally {
+              setSosLoading(false);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <ScrollView className="flex-1 bg-[#020617]">
@@ -119,11 +191,22 @@ export default function HomeScreen() {
       <View className="p-4">
         {/* SOS */}
         <View className="items-center mb-4">
-          <TouchableOpacity className="bg-red-600 px-8 py-4 rounded-full flex-row items-center">
-            <Ionicons name="alert-circle" size={22} color="white" />
-            <Text className="text-white text-lg font-bold ml-2">
-              {t.emergencySOS}
-            </Text>
+          <TouchableOpacity
+            onPress={handleSOSPress}
+            disabled={sosLoading}
+            className="bg-red-600 px-8 py-4 rounded-full flex-row items-center active:opacity-80"
+            style={{ opacity: sosLoading ? 0.6 : 1 }}
+          >
+            {sosLoading ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <>
+                <Ionicons name="alert-circle" size={22} color="white" />
+                <Text className="text-white text-lg font-bold ml-2">
+                  {t.emergencySOS}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
 

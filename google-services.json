@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "570571904002",
+    "project_id": "safeexit-nepal",
+    "storage_bucket": "safeexit-nepal.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570571904002:android:5b3d59ac651f4d3b85831b",
+        "android_client_info": {
+          "package_name": "com.safeexitnepal.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7stxLN9v4LYcwlct0USbel4JJ1qGaDcc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

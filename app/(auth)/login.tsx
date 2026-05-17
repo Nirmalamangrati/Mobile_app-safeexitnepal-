@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Mail, Lock, ArrowRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import messaging from "@react-native-firebase/messaging";
 
 const BASE_URL = "http://192.168.43.132:8000";
-//1. ALGORITHM: LEVENSHTEIN DISTANCE (STRING SIMILARITY)
 
+// 1. ALGORITHM: LEVENSHTEIN DISTANCE (STRING SIMILARITY)
 const getLevenshteinDistance = (a, b) => {
   if (!a || !b) return Math.abs((a || "").length - (b || "").length);
   const matrix = [];
@@ -40,14 +41,12 @@ const LoginForm = () => {
   const handleContactChange = (text) => {
     setContact(text);
 
-    // Trigger typo check only when user inputs the "@" symbol
     if (text.includes("@")) {
       const domain = text.split("@")[1];
       const commonDomains = ["gmail.com", "yahoo.com", "outlook.com"];
 
       if (domain) {
         for (let d of commonDomains) {
-          //Executing Levenshtein Distance Algorithm calculation
           const distance = getLevenshteinDistance(domain, d);
           if (distance > 0 && distance <= 2) {
             setEmailHint(`Did you mean @${d}?`);
@@ -60,17 +59,30 @@ const LoginForm = () => {
   };
 
   const handleLogin = async () => {
-    //2. ALGORITHM: REGEX PATTERN MATCHING (DETERMINISTIC FINITE AUTOMATON)
-
+    // 2. ALGORITHM: REGEX PATTERN MATCHING (DETERMINISTIC FINITE AUTOMATON)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10}$/;
 
     if (emailRegex.test(contact) || phoneRegex.test(contact)) {
       try {
+        let deviceToken = "";
+        try {
+          deviceToken = await messaging().getToken();
+          console.log("FCM Token Generated for Login:", deviceToken);
+        } catch (fcmError) {
+          console.log(
+            "Firebase token extraction bypassed or failed:",
+            fcmError,
+          );
+        }
         const response = await fetch(`${BASE_URL}/api/auth/send-otp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: contact, password: password }),
+          body: JSON.stringify({
+            email: contact,
+            password: password,
+            fcmToken: deviceToken,
+          }),
         });
 
         const data = await response.json();

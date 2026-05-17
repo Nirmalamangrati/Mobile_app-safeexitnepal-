@@ -45,7 +45,6 @@ interface UserData {
     phone: boolean;
   };
 }
-
 const ProfileScreen = () => {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
