@@ -13,7 +13,6 @@ import * as Location from "expo-location";
 import {
   Shield,
   MapPin,
-  X,
   AlertTriangle,
   Target,
   Zap,
@@ -31,66 +30,6 @@ export default function HomeScreen() {
   const [language, setLanguage] = useState("en");
   const [showReportForm, setShowReportForm] = useState(false);
   const [sosLoading, setSosLoading] = useState(false);
-  const translations = {
-    en: {
-      title: "SafeExit Nepal",
-      formTitle: "Report Incident",
-      reportSubtitle: "Help your community stay safe",
-      incidentType: "Incident Type",
-      latitude: "Latitude",
-      longitude: "Longitude",
-      description: "Description",
-      descriptionPlaceholder: "Describe the incident...",
-      submitReport: "Submit Report",
-      emergencySOS: "Emergency SOS",
-      reportIncident: "Report Incident",
-      location: "Enter your location",
-      critical: "Critical",
-      high: "High",
-      medium: "Medium",
-      low: "Low",
-      activeHazards: "Active Hazards",
-      hazardDesc: "Real-time disaster monitoring",
-      findShelters: "Find Shelters",
-      sheltersDesc: "Nearby safe locations",
-      communitySafety: "Community Safety",
-      communityDesc: "Crowdsourced reports",
-      rescueTeams: "Rescue Teams",
-      rescueDesc: "Emergency responders",
-      offlineResources: "Offline Resources",
-      offlineDesc: "Guides and maps",
-    },
-    ne: {
-      title: "सेफ एग्जिट नेपाल",
-      formTitle: "घटना रिपोर्ट गर्नुहोस्",
-      reportSubtitle: "समुदायलाई सुरक्षित राख्न मद्दत गर्नुहोस्",
-      incidentType: "घटनाको प्रकार",
-      latitude: "अक्षांश",
-      longitude: "देशान्तर",
-      description: "विवरण",
-      descriptionPlaceholder: "घटनाको विवरण लेख्नुहोस्...",
-      submitReport: "रिपोर्ट पठाउनुहोस्",
-      emergencySOS: "आपतकालीन SOS",
-      reportIncident: "घटना रिपोर्ट गर्नुहोस्",
-      location: "स्थान लेख्नुहोस्",
-      critical: "गम्भीर",
-      high: "उच्च",
-      medium: "मध्यम",
-      low: "कम",
-      activeHazards: "सक्रिय जोखिमहरू",
-      hazardDesc: "रियल-टाइम विपद् निगरानी",
-      findShelters: "आश्रय खोज्नुहोस्",
-      sheltersDesc: "नजिकका सुरक्षित स्थानहरू",
-      communitySafety: "समुदाय सुरक्षा",
-      communityDesc: "समुदायबाट प्राप्त रिपोर्टहरू",
-      rescueTeams: "उद्धार टोली",
-      rescueDesc: "आपतकालीन उद्धारकर्ता",
-      offlineResources: "अफलाइन स्रोतहरू",
-      offlineDesc: "गाइड र नक्साहरू",
-    },
-  };
-
-  const t = translations[language];
   const BASE_URL = "http://192.168.43.132:8000";
   const currentUserId = "6644bc231f23ab0017f8a91c";
   useEffect(() => {
@@ -176,7 +115,7 @@ export default function HomeScreen() {
             <Shield color="white" size={18} />
           </View>
 
-          <Text className="text-white text-xl font-bold">{t.title}</Text>
+          <Text className="text-white text-xl font-bold">SafeExit Nepal</Text>
         </View>
 
         <TouchableOpacity
@@ -205,7 +144,7 @@ export default function HomeScreen() {
               <>
                 <Ionicons name="alert-circle" size={22} color="white" />
                 <Text className="text-white text-lg font-bold ml-2">
-                  {t.emergencySOS}
+                  Emergency SOS
                 </Text>
               </>
             )}
@@ -216,7 +155,7 @@ export default function HomeScreen() {
         <View className="bg-[#0f172a] flex-row items-center p-3 rounded-xl mb-4 h-12">
           <MapPin color="#60a5fa" size={20} />
           <TextInput
-            placeholder={t.location}
+            placeholder="Current Location: Pulling GPS coordinates..."
             placeholderTextColor="#94a3b8"
             className="flex-1 text-white ml-2 h-10"
           />
@@ -225,10 +164,10 @@ export default function HomeScreen() {
         {/* STATUS CARDS */}
         <View className="flex-row flex-wrap justify-between mb-0">
           {[
-            { title: t.critical, color: "bg-red-600", icon: AlertTriangle },
-            { title: t.high, color: "bg-orange-500", icon: Target },
-            { title: t.medium, color: "bg-yellow-500", icon: Zap },
-            { title: t.low, color: "bg-green-600", icon: ShieldCheck },
+            { title: "Critical", color: "bg-red-600", icon: AlertTriangle },
+            { title: "High", color: "bg-orange-500", icon: Target },
+            { title: "Medium", color: "bg-yellow-500", icon: Zap },
+            { title: "Low", color: "bg-green-600", icon: ShieldCheck },
           ].map((item, i) => (
             <View
               key={i}
@@ -250,10 +189,8 @@ export default function HomeScreen() {
         {/* ACTIVE HAZARDS */}
         <View className="flex-row justify-between items-center mb-6">
           <View>
-            <Text className="text-white text-xl font-bold">
-              {t.activeHazards}
-            </Text>
-            <Text className="text-gray-400">{t.hazardDesc}</Text>
+            <Text className="text-white text-xl font-bold">Active Hazards</Text>
+            <Text className="text-gray-400">Hazards Desc</Text>
           </View>
 
           <View className="w-12 h-12 bg-blue-600 rounded-xl items-center justify-center">
@@ -265,20 +202,24 @@ export default function HomeScreen() {
         <View className="flex-row flex-wrap justify-between">
           {[
             {
-              title: t.findShelters,
-              desc: t.sheltersDesc,
+              title: "Find Shelters",
+              desc: "Shelters Desc",
               icon: MapPin,
               location: "Naya Bazaar Shelter",
               dist: "0.5 km",
             },
             {
-              title: t.rescueTeams,
-              desc: t.rescueDesc,
+              title: "Rescue Teams",
+              desc: "Rescue Teams Desc",
               icon: Users,
               location: "Pokhara City Hall",
               dist: "1.2 km",
             },
-            { title: t.communitySafety, desc: t.communityDesc, icon: Shield },
+            {
+              title: "Community Safety",
+              desc: "Community Safety Desc",
+              icon: Shield,
+            },
             { title: "Offline Resources", isOffline: true },
           ].map((item, i) => {
             const IconComponent = item.icon;
@@ -383,7 +324,7 @@ export default function HomeScreen() {
           className="bg-blue-600 p-4 rounded-xl items-center mt-2 mb-10"
         >
           <Text className="text-white font-bold text-lg">
-            {t.ReportIncident}
+            Report an Incident
           </Text>
         </TouchableOpacity>
 
@@ -394,7 +335,6 @@ export default function HomeScreen() {
           onRequestClose={() => setShowReportForm(false)}
         >
           <View style={{ flex: 1, backgroundColor: "#f4f6f9" }}>
-            {/* CLOSE BUTTON AT THE TOP OF THE FORM */}
             <TouchableOpacity
               onPress={() => setShowReportForm(false)}
               style={{
@@ -403,8 +343,6 @@ export default function HomeScreen() {
                 alignItems: "center",
               }}
             ></TouchableOpacity>
-
-            {/*  ACTUAL FORM COMPONENT LOADED SAFELY INSIDE MODAL */}
             <ReportIncident />
           </View>
         </Modal>

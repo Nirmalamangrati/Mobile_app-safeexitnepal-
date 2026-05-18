@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +9,7 @@ import {
   Switch,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import * as Location from "expo-location"; // 👈 Fixed: Added missing location import
 
 export default function ReportIncident(): React.JSX.Element {
   // Section 1 States: Incident Details
@@ -29,12 +30,44 @@ export default function ReportIncident(): React.JSX.Element {
   const [hideReporterIdentity, setHideReporterIdentity] =
     useState<boolean>(false);
 
+  // Location and Category States
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [incidentCategory, setIncidentCategory] = useState("");
+  const [locLoading, setLocLoading] = useState<boolean>(false);
+
   // Section 6 States: Terms and Declaration
   const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
 
+  useEffect(() => {
+    async function getLiveLocation() {
+      setLocLoading(true);
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        alert(
+          "Permission to access location was denied. GPS coordinates are required.",
+        );
+        setLocLoading(false);
+        return;
+      }
+
+      let currentLoc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      setLatitude(currentLoc.coords.latitude);
+      setLongitude(currentLoc.coords.longitude);
+      setLocLoading(false);
+    }
+
+    getLiveLocation();
+  }, []);
+
   // Form submission handler
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     if (
+      !incidentCategory ||
       !incidentType ||
       !incidentDate ||
       !location ||
@@ -45,32 +78,75 @@ export default function ReportIncident(): React.JSX.Element {
       alert("Please fill all mandatory fields marked with (*)");
       return;
     }
+
+    if (!latitude || !longitude) {
+      alert(
+        "GPS Location not linked yet. Please wait for coordinates to load.",
+      );
+      return;
+    }
+
     if (!agreeTerms) {
       alert("You must agree to the declaration statement before submitting.");
       return;
     }
 
-    // Process form data package
     const formData = {
+      incidentCategory,
       incidentType,
-      incidentDate,
-      location,
+      locationName: location,
+      latitude,
+      longitude,
       description,
-      suspect: {
+      suspectInfo: {
         name: suspectName,
         age: suspectAge,
         gender: suspectGender,
         contact: suspectContact,
       },
-      reporter: {
+      reporterInfo: {
         name: reporterName,
         contact: reporterContact,
         isAnonymous: hideReporterIdentity,
       },
     };
 
-    console.log("Submitting Form Data: ", formData);
-    alert("Incident Report Submitted Successfully!");
+    try {
+      // 👈 Fixed: Restored the complete API target route and port 5000 parameters
+      const response = await fetch("http://192.168.43", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        alert(
+          "🚨 Incident Report Sent to Server! Admin will review it shortly.",
+        );
+
+        setIncidentCategory("");
+        setIncidentType("");
+        setIncidentDate("");
+        setLocation("");
+        setDescription("");
+        setSuspectName("");
+        setSuspectAge("");
+        setSuspectGender("");
+        setSuspectContact("");
+        setAgreeTerms(false);
+      } else {
+        alert("Submission Failed: " + (result.error || "Server error"));
+      }
+    } catch (error) {
+      console.error("Form Post Error:", error);
+      alert(
+        "Network Error: Cannot connect to the backend server. Make sure nodemon server.js is running.",
+      );
+    }
   };
 
   return (
@@ -105,6 +181,25 @@ export default function ReportIncident(): React.JSX.Element {
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>📄 1. Incident Details</Text>
+        </View>
+
+        <Text style={styles.label}>Incident Category *</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={incidentCategory}
+            onValueChange={(itemValue: string) =>
+              setIncidentCategory(itemValue)
+            }
+          >
+            <Picker.Item label="Select Category" value="" />
+            <Picker.Item
+              label="🔴 Critical (Immediate Danger)"
+              value="critical"
+            />
+            <Picker.Item label="🟠 High (Severe Threat)" value="high" />
+            <Picker.Item label="🟡 Medium (Moderate Risk)" value="medium" />
+            <Picker.Item label="🟢 Low (Minor Incident)" value="low" />
+          </Picker>
         </View>
 
         <Text style={styles.label}>Incident Type *</Text>
@@ -225,6 +320,10 @@ export default function ReportIncident(): React.JSX.Element {
 
         <View style={styles.toggleRow}>
           <Text style={styles.label}>Keep my identity anonymous</Text>
+          <Switch
+            value={hideReporterIdentity}
+            onValueChange={setHideReporterIdentity}
+          />
         </View>
       </View>
 
