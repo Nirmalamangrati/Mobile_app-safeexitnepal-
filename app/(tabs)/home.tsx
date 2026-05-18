@@ -25,6 +25,8 @@ import {
   PlayCircle,
 } from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
+import ReportIncident from "@/component/ReportIncident";
+
 export default function HomeScreen() {
   const [language, setLanguage] = useState("en");
   const [showReportForm, setShowReportForm] = useState(false);
@@ -381,57 +383,34 @@ export default function HomeScreen() {
           className="bg-blue-600 p-4 rounded-xl items-center mt-2 mb-10"
         >
           <Text className="text-white font-bold text-lg">
-            {t.reportIncident}
+            {t.ReportIncident}
           </Text>
         </TouchableOpacity>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={showReportForm}
+          onRequestClose={() => setShowReportForm(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: "#f4f6f9" }}>
+            {/* CLOSE BUTTON AT THE TOP OF THE FORM */}
+            <TouchableOpacity
+              onPress={() => setShowReportForm(false)}
+              style={{
+                padding: 15,
+                backgroundColor: "#ef4444",
+                alignItems: "center",
+              }}
+            ></TouchableOpacity>
+
+            {/*  ACTUAL FORM COMPONENT LOADED SAFELY INSIDE MODAL */}
+            <ReportIncident />
+          </View>
+        </Modal>
       </View>
 
       {/* MODAL */}
-      <Modal visible={showReportForm} animationType="slide">
-        <View className="flex-1 bg-[#020617] p-5 pt-16">
-          <Text className="text-white text-2xl font-bold mb-2">
-            {t.formTitle}
-          </Text>
-
-          <Text className="text-gray-400 mb-6">{t.reportSubtitle}</Text>
-
-          <TextInput
-            placeholder="Type"
-            placeholderTextColor="#64748b"
-            className="bg-[#1e293b] text-white p-3 rounded-lg mb-3"
-          />
-
-          <TextInput
-            placeholder="Latitude"
-            placeholderTextColor="#64748b"
-            className="bg-[#1e293b] text-white p-3 rounded-lg mb-3"
-          />
-
-          <TextInput
-            placeholder="Longitude"
-            placeholderTextColor="#64748b"
-            className="bg-[#1e293b] text-white p-3 rounded-lg mb-3"
-          />
-
-          <TextInput
-            placeholder={t.descriptionPlaceholder}
-            placeholderTextColor="#64748b"
-            multiline
-            className="bg-[#1e293b] text-white p-3 rounded-lg h-28"
-          />
-
-          <TouchableOpacity className="bg-blue-600 p-4 rounded-xl mt-5 items-center">
-            <Text className="text-white font-bold">{t.submitReport}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setShowReportForm(false)}
-            className="mt-6 items-center"
-          >
-            <X color="white" size={28} />
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </ScrollView>
   );
 }
