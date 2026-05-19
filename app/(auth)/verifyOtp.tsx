@@ -10,9 +10,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowRight, ArrowLeft, RotateCcw } from "lucide-react-native";
-
 const BASE_URL = "http://192.168.43.132:8000";
-
 const VerifyOtpForm = () => {
   const router = useRouter();
   const { contact } = useLocalSearchParams<{ contact: string }>();
@@ -49,7 +47,7 @@ const VerifyOtpForm = () => {
   const handleResendOtp = async () => {
     setResending(true);
     try {
-      const response = await fetch(`${BASE_URL}/resend-otp`, {
+      const response = await fetch(`${BASE_URL}/api/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: contact }),
@@ -148,7 +146,9 @@ const VerifyOtpForm = () => {
         {otp.map((digit, idx) => (
           <TextInput
             key={idx}
-            ref={(ref) => (inputs.current[idx] = ref)}
+            ref={(ref) => {
+              inputs.current[idx] = ref;
+            }}
             className="w-12 h-14 bg-[#1e293b] border border-white/5 rounded-xl text-center text-white text-xl font-bold focus:border-[#b91c1c]"
             keyboardType="number-pad"
             maxLength={1}
@@ -183,7 +183,6 @@ const VerifyOtpForm = () => {
           </TouchableOpacity>
         )}
       </View>
-
       {/* Confirm Action Trigger Button */}
       <TouchableOpacity
         onPress={handleVerify}
@@ -205,5 +204,4 @@ const VerifyOtpForm = () => {
     </View>
   );
 };
-
 export default VerifyOtpForm;

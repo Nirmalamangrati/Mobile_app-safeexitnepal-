@@ -7,10 +7,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import * as Location from "expo-location"; // 👈 Fixed: Added missing location import
-
+import * as Location from "expo-location";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
 export default function ReportIncident(): React.JSX.Element {
   // Section 1 States: Incident Details
   const [incidentType, setIncidentType] = useState<string>("");
@@ -18,7 +22,7 @@ export default function ReportIncident(): React.JSX.Element {
   const [location, setLocation] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
-  // Section 2 States: Suspect / Person of Interest Information
+  // Section 2 States: Suspect Information
   const [suspectName, setSuspectName] = useState<string>("");
   const [suspectAge, setSuspectAge] = useState<string>("");
   const [suspectGender, setSuspectGender] = useState<string>("");
@@ -36,8 +40,13 @@ export default function ReportIncident(): React.JSX.Element {
   const [incidentCategory, setIncidentCategory] = useState("");
   const [locLoading, setLocLoading] = useState<boolean>(false);
 
+  // Section 5 States: Attached Files
+  const [attachedFile, setAttachedFile] =
+    useState<DocumentPicker.DocumentPickerAsset | null>(null);
+
   // Section 6 States: Terms and Declaration
   const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     async function getLiveLocation() {
@@ -45,8 +54,9 @@ export default function ReportIncident(): React.JSX.Element {
       let { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== "granted") {
-        alert(
-          "Permission to access location was denied. GPS coordinates are required.",
+        Alert.alert(
+          "Permission Denied",
+          "GPS coordinates are required to report an incident.",
         );
         setLocLoading(false);
         return;
@@ -64,7 +74,37 @@ export default function ReportIncident(): React.JSX.Element {
     getLiveLocation();
   }, []);
 
-  // Form submission handler
+  // 📁 Gallery kholera Multi-format files pick garne function:
+  const handlePickFile = async (): Promise<void> => {
+    try {
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permission.granted) {
+        Alert.alert("Permission required");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const file = result.assets[0];
+
+        setAttachedFile({
+          uri: file.uri,
+          name: file.fileName || "upload.jpg",
+          mimeType: file.mimeType || "image/jpeg",
+          size: file.fileSize || 0,
+        } as any);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Could not open gallery");
+    }
+  };
+  // 📤 Form Text Inputs + Multipart File Attachment eकैचोटी सबमिट गर्ने मुख्य फङ्सन:
   const handleSubmit = async (): Promise<void> => {
     if (
       !incidentCategory ||
@@ -75,59 +115,87 @@ export default function ReportIncident(): React.JSX.Element {
       !reporterName ||
       !reporterContact
     ) {
-      alert("Please fill all mandatory fields marked with (*)");
+      Alert.alert(
+        "Mandatory Fields",
+        "Please fill all mandatory fields marked with (*)",
+      );
       return;
     }
 
     if (!latitude || !longitude) {
-      alert(
+      Alert.alert(
+        "Location Error",
         "GPS Location not linked yet. Please wait for coordinates to load.",
       );
       return;
     }
 
     if (!agreeTerms) {
-      alert("You must agree to the declaration statement before submitting.");
+      Alert.alert(
+        "Declaration Statement",
+        "You must agree to the declaration statement before submitting.",
+      );
       return;
     }
 
-    const formData = {
-      incidentCategory,
-      incidentType,
-      locationName: location,
-      latitude,
-      longitude,
-      description,
-      suspectInfo: {
+    setSubmitting(true);
+    const formData = new FormData();
+
+    // Text details append parameters map:
+    formData.append("incidentCategory", incidentCategory);
+    formData.append("incidentType", incidentType);
+    formData.append("incidentDate", incidentDate);
+    formData.append("locationName", location);
+    formData.append("latitude", latitude.toString());
+    formData.append("longitude", longitude.toString());
+    formData.append("description", description);
+    formData.append(
+      "suspectInfo",
+      JSON.stringify({
         name: suspectName,
         age: suspectAge,
         gender: suspectGender,
         contact: suspectContact,
-      },
-      reporterInfo: {
+      }),
+    );
+    formData.append(
+      "reporterInfo",
+      JSON.stringify({
         name: reporterName,
         contact: reporterContact,
         isAnonymous: hideReporterIdentity,
-      },
-    };
+      }),
+    );
+
+    // 📁 File append processing (यदि फाइल सेलेक्ट गरिएको छ भने):
+    if (attachedFile) {
+      formData.append("file", {
+        uri: attachedFile.uri,
+        name: attachedFile.name,
+        type: attachedFile.mimeType || "application/octet-stream",
+      } as any);
+    }
 
     try {
-      // 👈 Fixed: Restored the complete API target route and port 5000 parameters
-      const response = await fetch("http://192.168.43", {
+      console.log("➔ [FRONTEND DISPATCH] Submitting Form with File data...");
+
+      const response = await fetch("http://192.168.43.132:8000/api/incidents", {
         method: "POST",
+        body: formData,
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
-        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
-        alert(
-          "🚨 Incident Report Sent to Server! Admin will review it shortly.",
+      if (response.ok) {
+        Alert.alert(
+          "🚨 Success",
+          "Incident Report Sent to Server! Admin will review it shortly.",
         );
 
+        // Clear subfields states parameters configuration loop:
         setIncidentCategory("");
         setIncidentType("");
         setIncidentDate("");
@@ -137,15 +205,22 @@ export default function ReportIncident(): React.JSX.Element {
         setSuspectAge("");
         setSuspectGender("");
         setSuspectContact("");
+        setAttachedFile(null);
         setAgreeTerms(false);
       } else {
-        alert("Submission Failed: " + (result.error || "Server error"));
+        Alert.alert(
+          "Submission Failed",
+          result.error || "Server error occurred.",
+        );
       }
     } catch (error) {
       console.error("Form Post Error:", error);
-      alert(
-        "Network Error: Cannot connect to the backend server. Make sure nodemon server.js is running.",
+      Alert.alert(
+        "Network Error",
+        "Cannot connect to the backend server. Make sure your server is running.",
       );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -176,7 +251,14 @@ export default function ReportIncident(): React.JSX.Element {
           improvements.
         </Text>
       </View>
-
+      {locLoading && (
+        <View className="flex-row items-center justify-center p-3 bg-red-950/30 border border-red-500/20 rounded-xl mb-4">
+          <ActivityIndicator size="small" color="#b91c1c" />
+          <Text className="text-gray-300 text-xs font-medium ml-2">
+            Fetching live GPS coordinates... Please wait.
+          </Text>
+        </View>
+      )}
       {/* SECTION 1: Incident Details */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
@@ -328,21 +410,44 @@ export default function ReportIncident(): React.JSX.Element {
       </View>
 
       {/* SECTION 5: File Attachment Box */}
-      <View style={styles.sectionCard}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
+      <View className="p-4 bg-slate-800 rounded-xl mb-4 w-full">
+        <View className="mb-3">
+          <Text className="text-white text-base font-bold">
             📁 5. Attached Files (Optional)
           </Text>
         </View>
-        <TouchableOpacity style={styles.uploadBox}>
-          <Text style={styles.uploadIcon}>📤</Text>
-          <Text style={styles.uploadText}>Choose file or drag here</Text>
-          <Text style={styles.uploadSub}>
-            (JPG, PNG, MP4, PDF | Max Size 10MB)
+
+        {/* ONPRESS HANDLER TRIGGER STRICKLY BINDED OUTSIDE NESTED OVERRIDES FOR SAFE HARDWARE CONTROL CLICK EVENT */}
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={handlePickFile}
+          className="border border-dashed border-blue-500 rounded-xl p-6 items-center bg-slate-900 mt-2 w-full justify-center"
+        >
+          <Text className="text-3xl mb-2">📤</Text>
+
+          <Text className="text-blue-500 font-semibold text-center text-sm">
+            {attachedFile ? attachedFile.name : "Choose file or drag here"}
+          </Text>
+
+          <Text
+            className={`text-xs mt-1 text-center ${attachedFile ? "text-green-500" : "text-gray-400"}`}
+          >
+            {attachedFile
+              ? `Selected Size: ${(attachedFile.size! / (1024 * 1024)).toFixed(2)} MB (Click to swap)`
+              : "(JPG, PNG, MP4, PDF | Max Size 10MB)"}
           </Text>
         </TouchableOpacity>
-      </View>
 
+        {/* VISUAL LAYOUT PREVIEW STRINGS BLOCK INTERFACE RUN DISPLAY SECTION CHECK */}
+        {attachedFile && attachedFile.mimeType?.startsWith("image/") && (
+          <View className="items-center mt-3 w-full justify-center">
+            <Image
+              source={{ uri: attachedFile.uri }}
+              className="w-28 h-28 rounded-xl"
+            />
+          </View>
+        )}
+      </View>
       {/* SECTION 6: Declaration Box */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>

@@ -17,7 +17,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)/login" />
         <Stack.Screen name="(auth)/verifyOtp" />
         <Stack.Screen name="(auth)/signupForm" />
-        <Stack.Screen name="home" options={{ title: "Home" }} />
+        <Stack.Screen name="(tabs)/home" options={{ title: "Home" }} />
       </Stack>
     </>
   );
