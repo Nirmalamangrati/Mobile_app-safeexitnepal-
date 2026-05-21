@@ -104,7 +104,7 @@ export default function ReportIncident(): React.JSX.Element {
       Alert.alert("Error", "Could not open gallery");
     }
   };
-  // 📤 Form Text Inputs + Multipart File Attachment eकैचोटी सबमिट गर्ने मुख्य फङ्सन:
+  // 📤 Form Text Inputs + Multipart File Attachment
   const handleSubmit = async (): Promise<void> => {
     if (
       !incidentCategory ||
@@ -167,7 +167,7 @@ export default function ReportIncident(): React.JSX.Element {
       }),
     );
 
-    // 📁 File append processing (यदि फाइल सेलेक्ट गरिएको छ भने):
+    // 📁 File append processing
     if (attachedFile) {
       formData.append("file", {
         uri: attachedFile.uri,
