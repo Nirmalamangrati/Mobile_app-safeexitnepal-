@@ -26,14 +26,47 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import ReportIncident from "@/component/ReportIncident";
 
+// Type definition for counts mapping
+interface IncidentCounts {
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+}
+
 export default function HomeScreen() {
   const [language, setLanguage] = useState("en");
   const [showReportForm, setShowReportForm] = useState(false);
   const [sosLoading, setSosLoading] = useState(false);
+  const [counts, setCounts] = useState<IncidentCounts>({
+    critical: 0,
+    high: 0,
+    medium: 0,
+    low: 0,
+  });
+
+  const [countsLoading, setCountsLoading] = useState<boolean>(true);
+
   const BASE_URL = "http://192.168.43.132:8000";
   const currentUserId = "6644bc231f23ab0017f8a91c";
+
+  // 1. Fetch Dynamic Incident Counts from Backend
+  const fetchIncidentCounts = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/incidents/counts`);
+      const data = await response.json();
+      if (response.ok) {
+        setCounts(data);
+      }
+    } catch (error) {
+      console.error("Fetch Counts Error:", error);
+    } finally {
+      setCountsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // 1. ALGORITHM: PERMISSION CHECK + PROMPT
+    // Permission Check + Prompt
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -43,9 +76,12 @@ export default function HomeScreen() {
         );
       }
     })();
+
+    // Load initial counters
+    fetchIncidentCounts();
   }, []);
 
-  //SoOS BUTTON LOGIC
+  // 2. SOS BUTTON LOGIC
   const handleSOSPress = async () => {
     Alert.alert(
       "TRIGGER EMERGENCY SOS?",
@@ -58,7 +94,6 @@ export default function HomeScreen() {
           onPress: async () => {
             setSosLoading(true);
             try {
-              // 1. ALGORITHM: GEOFENCING + GPS COORDINATE EXTRACTION
               let currentPosition = await Location.getCurrentPositionAsync({
                 accuracy: Location.Accuracy.High,
               });
@@ -74,7 +109,6 @@ export default function HomeScreen() {
                 },
               };
 
-              // calling backend API to trigger SOS
               const response = await fetch(`${BASE_URL}/api/user/trigger`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -95,7 +129,7 @@ export default function HomeScreen() {
               console.log("SOS Activation Error:", error);
               Alert.alert(
                 "Network Error",
-                "backend can not be connect with server. Please try again later.",
+                "Backend cannot be connected with server. Please try again later.",
               );
             } finally {
               setSosLoading(false);
@@ -106,6 +140,14 @@ export default function HomeScreen() {
     );
   };
 
+  if (countsLoading) {
+    return (
+      <View className="flex-1 bg-[#020617] justify-center items-center">
+        <ActivityIndicator size="large" color="#3b82f6" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView className="flex-1 bg-[#020617]">
       {/* HEADER */}
@@ -114,7 +156,6 @@ export default function HomeScreen() {
           <View className="w-9 h-9 rounded-full bg-blue-500 items-center justify-center mr-2">
             <Shield color="white" size={18} />
           </View>
-
           <Text className="text-white text-xl font-bold">SafeExit Nepal</Text>
         </View>
 
@@ -128,14 +169,14 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* BODY */}
+      {/* BODY PANEL */}
       <View className="p-4">
-        {/* SOS */}
+        {/* EMERGENCY SOS BUTTON */}
         <View className="items-center mb-4">
           <TouchableOpacity
             onPress={handleSOSPress}
             disabled={sosLoading}
-            className="bg-red-600 px-8 py-4 rounded-full flex-row items-center active:opacity-80"
+            className="bg-red-600 px-8 py-4 rounded-full flex-row items-center active:opacity-80 w-full justify-center"
             style={{ opacity: sosLoading ? 0.6 : 1 }}
           >
             {sosLoading ? (
@@ -151,23 +192,44 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* LOCATION */}
-        <View className="bg-[#0f172a] flex-row items-center p-3 rounded-xl mb-4 h-12">
+        {/* GPS LOCATION FIELD */}
+        <View className="bg-[#0f172a] flex-row items-center p-3 rounded-xl mb-4 h-12 border border-white/5">
           <MapPin color="#60a5fa" size={20} />
           <TextInput
             placeholder="Current Location: Pulling GPS coordinates..."
             placeholderTextColor="#94a3b8"
             className="flex-1 text-white ml-2 h-10"
+            editable={false}
           />
         </View>
 
-        {/* STATUS CARDS */}
-        <View className="flex-row flex-wrap justify-between mb-0">
+        {/* STATUS CARDS WITH LIVE DYNAMIC BACKEND COUNTS */}
+        <View className="flex-row flex-wrap justify-between mb-4">
           {[
-            { title: "Critical", color: "bg-red-600", icon: AlertTriangle },
-            { title: "High", color: "bg-orange-500", icon: Target },
-            { title: "Medium", color: "bg-yellow-500", icon: Zap },
-            { title: "Low", color: "bg-green-600", icon: ShieldCheck },
+            {
+              title: "Critical",
+              color: "bg-red-600",
+              count: counts.critical,
+              icon: AlertTriangle,
+            },
+            {
+              title: "High",
+              color: "bg-orange-500",
+              count: counts.high,
+              icon: Target,
+            },
+            {
+              title: "Medium",
+              color: "bg-yellow-500",
+              count: counts.medium,
+              icon: Zap,
+            },
+            {
+              title: "Low",
+              color: "bg-green-600",
+              count: counts.low,
+              icon: ShieldCheck,
+            },
           ].map((item, i) => (
             <View
               key={i}
@@ -177,7 +239,9 @@ export default function HomeScreen() {
                 <Text className="text-white text-xs font-bold opacity-90">
                   {item.title}
                 </Text>
-                <Text className="text-white text-xl font-bold">0</Text>
+                <Text className="text-white text-xl font-bold">
+                  {item.count}
+                </Text>
               </View>
               <View className="opacity-30">
                 <item.icon color="white" size={24} />
@@ -186,19 +250,20 @@ export default function HomeScreen() {
           ))}
         </View>
 
-        {/* ACTIVE HAZARDS */}
-        <View className="flex-row justify-between items-center mb-6">
+        {/* ACTIVE HAZARDS NOTIFIER */}
+        <View className="flex-row justify-between items-center mb-6 bg-[#0f172a] p-4 rounded-xl border border-white/5">
           <View>
             <Text className="text-white text-xl font-bold">Active Hazards</Text>
-            <Text className="text-gray-400">Hazards Desc</Text>
+            <Text className="text-gray-400 text-xs">
+              Hazards Desc via AI Clustering
+            </Text>
           </View>
-
           <View className="w-12 h-12 bg-blue-600 rounded-xl items-center justify-center">
             <Text className="text-white font-bold">AI</Text>
           </View>
         </View>
 
-        {/* FEATURE CARDS */}
+        {/* FEATURE CARDS MATRIX CONTAINER */}
         <View className="flex-row flex-wrap justify-between">
           {[
             {
@@ -247,6 +312,7 @@ export default function HomeScreen() {
                     {item.desc || "Important data cached."}
                   </Text>
                 </View>
+
                 <View className="px-2 pb-2">
                   {item.isOffline ? (
                     <View className="bg-[#0f172a]/60 p-2 rounded-xl">
@@ -258,12 +324,12 @@ export default function HomeScreen() {
                             color: "#22c55e",
                           },
                           {
-                            title: "Mesh networking tools",
+                            title: "Mesh tools",
                             icon: Wrench,
                             color: "#3b82f6",
                           },
                           {
-                            title: "Emergency Procedures",
+                            title: "Procedures",
                             icon: BarChart2,
                             color: "#f59e0b",
                           },
@@ -278,7 +344,10 @@ export default function HomeScreen() {
                             className="w-[45%] items-center my-1.5"
                           >
                             <res.icon color={res.color} size={18} />
-                            <Text className="text-white text-[8px] mt-1">
+                            <Text
+                              className="text-white text-[8px] mt-1 text-center"
+                              numberOfLines={1}
+                            >
                               {res.title}
                             </Text>
                           </View>
@@ -287,7 +356,7 @@ export default function HomeScreen() {
                     </View>
                   ) : (
                     <View>
-                      <View className="h-20 bg-gray-700 rounded-lg items-center justify-center">
+                      <View className="h-20 bg-gray-800 rounded-lg items-center justify-center">
                         <Text className="text-gray-500 text-[10px]">
                           Map View
                         </Text>
@@ -318,37 +387,47 @@ export default function HomeScreen() {
           })}
         </View>
 
-        {/* REPORT BUTTON */}
+        {/* NEW LAUNCH COMPONENT: REPORT INCIDENT TRIGGER MODAL BUTTON */}
         <TouchableOpacity
           onPress={() => setShowReportForm(true)}
-          className="bg-blue-600 p-4 rounded-xl items-center mt-2 mb-10"
+          className="bg-blue-600 p-4 rounded-xl flex-row justify-center items-center mt-4 mb-8"
         >
-          <Text className="text-white font-bold text-lg">
-            Report an Incident
+          <Ionicons name="document-text" size={20} color="white" />
+          <Text className="text-white font-bold text-lg ml-2">
+            Report New Incident
           </Text>
         </TouchableOpacity>
-
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={showReportForm}
-          onRequestClose={() => setShowReportForm(false)}
-        >
-          <View style={{ flex: 1, backgroundColor: "#f4f6f9" }}>
-            <TouchableOpacity
-              onPress={() => setShowReportForm(false)}
-              style={{
-                padding: 15,
-                backgroundColor: "#ef4444",
-                alignItems: "center",
-              }}
-            ></TouchableOpacity>
-            <ReportIncident />
-          </View>
-        </Modal>
       </View>
 
-      {/* MODAL */}
+      {/* REPORT FORM COMPONENT INJECTED SLIDE MODAL LAYER */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={showReportForm}
+        onRequestClose={() => setShowReportForm(false)}
+      >
+        <View className="flex-1 bg-[#0f172a]">
+          {/* Modal Header */}
+          <View className="p-4 border-b border-[#1e293b] flex-row justify-between items-center pt-12">
+            <Text className="text-white text-lg font-bold">
+              Log Incident Report
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                setShowReportForm(false);
+                fetchIncidentCounts();
+              }}
+            >
+              <Ionicons name="close-circle" size={28} color="#94a3b8" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Actual Injected Form view scroll child component */}
+          <ScrollView className="flex-1">
+            <ReportIncident />
+          </ScrollView>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }

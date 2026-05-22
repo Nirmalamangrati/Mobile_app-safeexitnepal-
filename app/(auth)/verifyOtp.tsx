@@ -105,7 +105,7 @@ const VerifyOtpForm = () => {
         Alert.alert("Verified", "Login successful!", [
           {
             text: "Continue",
-            onPress: () => router.push("/(tabs)/home" as any),
+            onPress: () => router.push("/home" as any),
           },
         ]);
       } else {
