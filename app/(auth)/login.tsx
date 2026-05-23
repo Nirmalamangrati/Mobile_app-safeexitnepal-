@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Mail, Lock, ArrowRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import messaging from "@react-native-firebase/messaging";
+// 1. Import the modular functions instead of the default export
+import { getMessaging, getToken } from "@react-native-firebase/messaging";
 
-const BASE_URL = "http://192.168.43.132:8000";
+const BASE_URL = "http:// 192.168.43.132:8000";
 
 // 1. ALGORITHM: LEVENSHTEIN DISTANCE (STRING SIMILARITY)
 const getLevenshteinDistance = (a, b) => {
@@ -67,7 +68,9 @@ const LoginForm = () => {
       try {
         let deviceToken = "";
         try {
-          deviceToken = await messaging().getToken();
+          // 2. Initialize messaging using the modular pattern and fetch token
+          const messagingInstance = getMessaging();
+          deviceToken = await getToken(messagingInstance);
           console.log("FCM Token Generated for Login:", deviceToken);
         } catch (fcmError) {
           console.log(

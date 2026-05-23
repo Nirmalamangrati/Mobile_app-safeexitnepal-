@@ -24,7 +24,7 @@ import {
   ArrowLeft,
 } from "lucide-react-native";
 
-const BASE_URL = "http://192.168.43.132:8000";
+const BASE_URL = "http:// 192.168.43.132:8000";
 
 type PermissionKey =
   | "location"
