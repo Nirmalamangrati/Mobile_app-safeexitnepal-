@@ -24,7 +24,7 @@ import {
   ArrowLeft,
 } from "lucide-react-native";
 
-const BASE_URL = "http:// 192.168.43.132:8000";
+const BASE_URL = "http://192.168.43.132:8000";
 
 type PermissionKey =
   | "location"
@@ -197,7 +197,7 @@ const SafeExitSignup = () => {
       if (response.ok) {
         setIsModalVisible(false);
 
-        Alert.alert("Success 🎉", "Account created successfully!", [
+        Alert.alert("Success ", "Account created successfully!", [
           {
             text: "OK",
             onPress: () => router.push("/login"),

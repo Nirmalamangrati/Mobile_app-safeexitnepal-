@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 // 1. Import the modular functions instead of the default export
 import { getMessaging, getToken } from "@react-native-firebase/messaging";
 
-const BASE_URL = "http:// 192.168.43.132:8000";
+const BASE_URL = "https://rummage-tucking-dividend.ngrok-free.dev";
 
 // 1. ALGORITHM: LEVENSHTEIN DISTANCE (STRING SIMILARITY)
 const getLevenshteinDistance = (a, b) => {
