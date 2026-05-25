@@ -161,7 +161,7 @@ export default function ReportIncident(): React.JSX.Element {
     formData.append(
       "reporterInfo",
       JSON.stringify({
-        name: reporterName,
+        yourName: reporterName,
         contact: reporterContact,
         isAnonymous: hideReporterIdentity,
       }),
