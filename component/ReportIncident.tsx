@@ -104,7 +104,7 @@ export default function ReportIncident(): React.JSX.Element {
       Alert.alert("Error", "Could not open gallery");
     }
   };
-  // 📤 Form Text Inputs + Multipart File Attachment
+  //  Form Text Inputs + Multipart File Attachment
   const handleSubmit = async (): Promise<void> => {
     if (
       !incidentCategory ||

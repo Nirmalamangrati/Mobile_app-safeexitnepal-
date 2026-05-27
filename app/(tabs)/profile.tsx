@@ -44,6 +44,13 @@ interface UserData {
     sms: boolean;
     phone: boolean;
   };
+  safetyInfo?: {
+    bloodGroup?: string;
+    medicalConditions?: string;
+    allergies?: string;
+    address?: string;
+    hospital?: string;
+  };
 }
 const ProfileScreen = () => {
   const router = useRouter();
@@ -182,7 +189,10 @@ const ProfileScreen = () => {
         <View className="mt-4 bg-[#b91c1c]/20 border border-[#b91c1c]/30 px-4 py-1.5 rounded-full flex-row items-center">
           <Heart color="#b91c1c" size={14} fill="#b91c1c" />
           <Text className="text-white text-xs font-bold ml-2">
-            Blood Group: {user?.bloodGroup || "Not Specified"}
+            Blood Group:{" "}
+            {user?.safetyInfo?.bloodGroup ||
+              user?.bloodGroup ||
+              "Not Specified"}
           </Text>
         </View>
       </View>
@@ -245,7 +255,9 @@ const ProfileScreen = () => {
                     Permanent Address
                   </Text>
                   <Text className="text-white font-medium mt-0.5">
-                    {user?.address || "Not Provided"}
+                    {user?.safetyInfo?.address
+                      ? user.safetyInfo.address
+                      : "Not Provided"}
                   </Text>
                 </View>
               </View>
@@ -318,10 +330,10 @@ const ProfileScreen = () => {
                   router.push({
                     pathname: "/medical-info" as any,
                     params: {
-                      bloodGroup: user?.bloodGroup,
-                      medicalConditions: user?.medicalConditions,
-                      allergies: user?.allergies,
-                      hospital: user?.hospital,
+                      bloodGroup: user?.safetyInfo?.bloodGroup,
+                      medicalConditions: user?.safetyInfo?.medicalConditions,
+                      allergies: user?.safetyInfo?.allergies,
+                      hospital: user?.safetyInfo?.hospital,
                     },
                   })
                 }
@@ -344,13 +356,13 @@ const ProfileScreen = () => {
                     Medical Conditions:
                   </Text>
                   <Text className="text-white text-xs font-medium">
-                    {user?.medicalConditions || "None"}
+                    {user?.safetyInfo?.medicalConditions || "None"}
                   </Text>
                 </View>
                 <View className="flex-row justify-between">
                   <Text className="text-gray-400 text-xs">Allergies:</Text>
                   <Text className="text-white text-xs font-medium">
-                    {user?.allergies || "None"}
+                    {user?.safetyInfo?.allergies || "None"}
                   </Text>
                 </View>
                 <View className="flex-row justify-between">
@@ -358,7 +370,7 @@ const ProfileScreen = () => {
                     Preferred Hospital:
                   </Text>
                   <Text className="text-white text-xs font-medium">
-                    {user?.hospital || "Not Provided"}
+                    {user?.safetyInfo?.address || "Not Provided"}
                   </Text>
                 </View>
               </View>
