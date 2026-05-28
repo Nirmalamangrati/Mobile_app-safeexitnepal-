@@ -45,6 +45,7 @@ const SafeExitSignup = () => {
   const [newContactRelationship, setNewContactRelationship] = useState("");
   // Main Form Data
   const [formData, setFormData] = useState({
+    fcmToken: "",
     fullName: "",
     phone: "",
     email: "",
@@ -87,6 +88,27 @@ const SafeExitSignup = () => {
         ...prev.permissions,
         [key]: !prev.permissions[key],
       },
+    }));
+  };
+  // safetyInfo
+  const handleSafetyInfoChange = (
+    field: keyof typeof formData.safetyInfo,
+    value: string,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      safetyInfo: {
+        ...prev.safetyInfo,
+        [field]: value,
+      },
+    }));
+  };
+
+  // gender update
+  const handleGenderChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      gender: value,
     }));
   };
 
@@ -575,14 +597,8 @@ const SafeExitSignup = () => {
                         item.key as keyof typeof formData.safetyInfo
                       ]
                     }
-                    onChangeText={(t) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        safetyInfo: {
-                          ...prev.safetyInfo,
-                          [item.key]: t,
-                        },
-                      }))
+                    onChangeText={(text) =>
+                      handleSafetyInfoChange("bloodGroup", text)
                     }
                     className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 mb-3 text-sm"
                   />
