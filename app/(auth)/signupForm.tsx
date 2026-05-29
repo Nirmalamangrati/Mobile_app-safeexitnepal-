@@ -103,15 +103,6 @@ const SafeExitSignup = () => {
       },
     }));
   };
-
-  // gender update
-  const handleGenderChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      gender: value,
-    }));
-  };
-
   // Add Contact
   const handleAddContact = () => {
     if (
@@ -598,7 +589,10 @@ const SafeExitSignup = () => {
                       ]
                     }
                     onChangeText={(text) =>
-                      handleSafetyInfoChange("bloodGroup", text)
+                      handleSafetyInfoChange(
+                        item.key as keyof typeof formData.safetyInfo,
+                        text,
+                      )
                     }
                     className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 mb-3 text-sm"
                   />

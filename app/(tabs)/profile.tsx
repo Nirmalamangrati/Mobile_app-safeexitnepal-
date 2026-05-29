@@ -225,7 +225,7 @@ const ProfileScreen = () => {
                 <View className="ml-4">
                   <Text className="text-gray-400 text-xs">Gender</Text>
                   <Text className="text-white font-medium mt-0.5">
-                    {user?.gender || "Female"}
+                    {user?.gender || "Not Specified"}
                   </Text>
                 </View>
               </View>
@@ -239,7 +239,7 @@ const ProfileScreen = () => {
                 <View className="ml-4">
                   <Text className="text-gray-400 text-xs">Date of Birth</Text>
                   <Text className="text-white font-medium mt-0.5">
-                    {user?.dob || "Not Provided"}
+                    {user?.dob || "Not Specified"}
                   </Text>
                 </View>
               </View>
@@ -255,9 +255,7 @@ const ProfileScreen = () => {
                     Permanent Address
                   </Text>
                   <Text className="text-white font-medium mt-0.5">
-                    {user?.safetyInfo?.address
-                      ? user.safetyInfo.address
-                      : "Not Provided"}
+                    {user?.safetyInfo?.address || "Not Specified"}
                   </Text>
                 </View>
               </View>
@@ -330,10 +328,16 @@ const ProfileScreen = () => {
                   router.push({
                     pathname: "/medical-info" as any,
                     params: {
-                      bloodGroup: user?.safetyInfo?.bloodGroup,
-                      medicalConditions: user?.safetyInfo?.medicalConditions,
-                      allergies: user?.safetyInfo?.allergies,
-                      hospital: user?.safetyInfo?.hospital,
+                      bloodGroup:
+                        user?.bloodGroup || user?.safetyInfo?.bloodGroup || "",
+                      medicalConditions:
+                        user?.medicalConditions ||
+                        user?.safetyInfo?.medicalConditions ||
+                        "",
+                      allergies:
+                        user?.allergies || user?.safetyInfo?.allergies || "",
+                      hospital:
+                        user?.hospital || user?.safetyInfo?.hospital || "",
                     },
                   })
                 }
@@ -370,34 +374,66 @@ const ProfileScreen = () => {
                     Preferred Hospital:
                   </Text>
                   <Text className="text-white text-xs font-medium">
-                    {user?.safetyInfo?.address || "Not Provided"}
+                    {user?.safetyInfo?.hospital || "Not Provided"}
                   </Text>
                 </View>
               </View>
             </View>
-
             {/*  PRIVACY & PERMISSIONS SECTION */}
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: "/privacy-permissions" as any,
-                  params: {
-                    permissions: JSON.stringify(user?.permissions || {}),
-                  },
-                })
-              }
-              className="flex-row items-center justify-between p-4"
-            >
-              <View className="flex-row items-center">
-                <View className="w-9 h-9 bg-slate-800 rounded-xl items-center justify-center">
-                  <Shield color="#94a3b8" size={18} />
-                </View>
-                <Text className="text-white font-semibold ml-4">
-                  Privacy & Permissions
+            <View className="p-4 border-t border-white/5 bg-[#0f172a]/30 mx-4 mb-4 rounded-xl space-y-2.5">
+              <View className="flex-row items-center mb-1">
+                <Shield color="#94a3b8" size={16} />
+                <Text className="text-white font-semibold ml-2 text-sm">
+                  Privacy Preferences Status
                 </Text>
               </View>
-              <ChevronRight color="#475569" size={18} />
-            </TouchableOpacity>
+
+              {/* 1. Location Perm */}
+              <View className="flex-row justify-between items-center py-0.5">
+                <Text className="text-gray-400 text-xs">Location Access:</Text>
+                <Text
+                  className={`text-xs font-bold ${user?.permissions?.location ? "text-emerald-500" : "text-rose-500"}`}
+                >
+                  {user?.permissions?.location ? "ENABLED" : "DISABLED"}
+                </Text>
+              </View>
+
+              {/* 2. SMS Trigger Perm */}
+              <View className="flex-row justify-between items-center py-0.5">
+                <Text className="text-gray-400 text-xs">
+                  Automated SMS Alerts:
+                </Text>
+                <Text
+                  className={`text-xs font-bold ${user?.permissions?.sms ? "text-emerald-500" : "text-rose-500"}`}
+                >
+                  {user?.permissions?.sms ? "ENABLED" : "DISABLED"}
+                </Text>
+              </View>
+
+              {/* 3. Phone Dial Perm */}
+              <View className="flex-row justify-between items-center py-0.5">
+                <Text className="text-gray-400 text-xs">
+                  Direct Phone Dial:
+                </Text>
+                <Text
+                  className={`text-xs font-bold ${user?.permissions?.phone ? "text-emerald-500" : "text-rose-500"}`}
+                >
+                  {user?.permissions?.phone ? "ENABLED" : "DISABLED"}
+                </Text>
+              </View>
+
+              {/* 4. Notifications Perm */}
+              <View className="flex-row justify-between items-center py-0.5">
+                <Text className="text-gray-400 text-xs">
+                  Push Notifications:
+                </Text>
+                <Text
+                  className={`text-xs font-bold ${user?.permissions?.notifications ? "text-emerald-500" : "text-rose-500"}`}
+                >
+                  {user?.permissions?.notifications ? "ENABLED" : "DISABLED"}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
 

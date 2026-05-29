@@ -50,7 +50,7 @@ const VerifyOtpForm = () => {
       const response = await fetch(`${BASE_URL}/api/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: contact }),
+        body: JSON.stringify({ email: contact, phone: contact }),
       });
 
       if (response.ok) {
@@ -94,12 +94,18 @@ const VerifyOtpForm = () => {
       const response = await fetch(`${BASE_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: contact, otp: fullOtp }),
+        body: JSON.stringify({ email: contact, phone: contact, otp: fullOtp }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
+        console.log("=====================================");
+        console.log(
+          "🔥 SERVER RETURNED USER OBJECT:",
+          JSON.stringify(data.user, null, 2),
+        );
+        console.log("=====================================");
         await AsyncStorage.setItem("userToken", data.token);
         await AsyncStorage.setItem("userData", JSON.stringify(data.user));
         Alert.alert("Verified", "Login successful!", [
