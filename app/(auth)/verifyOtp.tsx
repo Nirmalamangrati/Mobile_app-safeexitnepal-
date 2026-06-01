@@ -100,12 +100,6 @@ const VerifyOtpForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("=====================================");
-        console.log(
-          "🔥 SERVER RETURNED USER OBJECT:",
-          JSON.stringify(data.user, null, 2),
-        );
-        console.log("=====================================");
         await AsyncStorage.setItem("userToken", data.token);
         await AsyncStorage.setItem("userData", JSON.stringify(data.user));
         Alert.alert("Verified", "Login successful!", [
