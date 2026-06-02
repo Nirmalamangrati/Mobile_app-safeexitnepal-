@@ -103,6 +103,7 @@ const LoginForm = () => {
           Alert.alert("Error", data.error || "Failed to send OTP.");
         }
       } catch (error) {
+        console.log("", error);
         Alert.alert("Connection Error", "Unable to connect to the server.");
       }
     } else {
