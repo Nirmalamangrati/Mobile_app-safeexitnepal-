@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, Dimensions, TouchableOpacity } from "react-native";
+import { View, Text, Dimensions, TouchableOpacity, Modal } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { io } from "socket.io-client";
-import { Users } from "lucide-react-native";
+import { Users, X } from "lucide-react-native"; // बन्द गर्न X थपियो
 
 export default function TrackTeamMap({
   route,
@@ -15,6 +15,8 @@ export default function TrackTeamMap({
   isMiniMap?: boolean;
   item?: any;
 }) {
+  const [isModalOpen, setIsModalOpen] = useState(false); // 🎯 मोडल स्टेट
+
   const team = useMemo(() => route?.params?.team || {}, [route?.params?.team]);
   const clientLoc = useMemo(
     () => ({
@@ -75,7 +77,41 @@ export default function TrackTeamMap({
   const latDelta = Math.abs(clientLoc.latitude - teamLoc.latitude) * 2;
   const lngDelta = Math.abs(clientLoc.longitude - teamLoc.longitude) * 2;
 
-  // 🎯 फिक्स: झुन्डिएका र दोहोरिएका पुराना ट्यागहरू हटाएर सफा २x२ बक्स बनाइयो
+  // 🗺️ म्याप कम्पोनेन्ट (जसलाई हामी मोडल र फुल स्क्रिन दुबैमा चलाउन सक्छौँ)
+  const RenderMap = () => (
+    <MapView
+      style={{
+        width: Dimensions.get("window").width,
+        height: Dimensions.get("window").height,
+      }}
+      initialRegion={{
+        latitude: (clientLoc.latitude + teamLoc.latitude) / 2,
+        longitude: (clientLoc.longitude + teamLoc.longitude) / 2,
+        latitudeDelta: latDelta < 0.005 ? 0.01 : latDelta,
+        longitudeDelta: lngDelta < 0.005 ? 0.01 : lngDelta,
+      }}
+    >
+      <Marker
+        coordinate={clientLoc}
+        title="Your Emergency Location"
+        pinColor="red"
+      />
+      <Marker
+        coordinate={teamLoc}
+        title={team.name || "Rescue Team"}
+        description={`Arriving in ${eta}`}
+        pinColor="blue"
+      />
+      {roadRoute.length > 0 && (
+        <Polyline
+          coordinates={roadRoute}
+          strokeColor="#00e5ff"
+          strokeWidth={5}
+        />
+      )}
+    </MapView>
+  );
+
   if (isMiniMap) {
     return (
       <View className="w-[48.5%] bg-[#0f172a] rounded-2xl p-3 mb-4 border border-white/5 overflow-hidden">
@@ -95,68 +131,37 @@ export default function TrackTeamMap({
         </View>
 
         <View className="px-1 pb-1">
-          {/* 🗺️ प्रिमियम म्याप प्लेसहोल्डर बक्स */}
-          <View className="h-20 bg-[#0f172a]/40 rounded-lg items-center justify-center ">
-            <Text className="text-gray-500 text-white font-medium tracking-wide">
-              Map View
-            </Text>
-          </View>
-
-          <View className="mt-2.5">
-            <View className="flex-row justify-between items-center">
-              <Text
-                className="text-white text-[8px] flex-1 mr-1"
-                numberOfLines={1}
-              >
-                📍 Pokhara City Hall
-              </Text>
-              <Text className="text-gray-400 text-[8px]">
-                ({(1.2).toFixed(1)} km)
-              </Text>
-            </View>
-            <Text className="text-white text-[8px] font-semibold mt-1">
-              Capacity: 70% Full
-            </Text>
-          </View>
+          {/* 🎯 फिक्स: View लाई TouchableOpacity बनाइयो र onClick मा स्टेट चेन्ज थपियो */}
+          <TouchableOpacity
+            onPress={() => setIsModalOpen(true)}
+            className="h-20 bg-[#0f172a]/40 rounded-lg items-center justify-center border border-white/10"
+          >
+            <Text className="text-white font-medium tracking-wide">View</Text>
+          </TouchableOpacity>
         </View>
+
+        {/* 🎯 थपिएको मोडल लेआउट */}
+        <Modal
+          visible={isModalOpen}
+          animationType="slide"
+          onRequestClose={() => setIsModalOpen(false)}
+        >
+          <View className="flex-1">
+            <RenderMap />
+            <TouchableOpacity
+              onPress={() => setIsModalOpen(false)}
+              className="absolute top-12 right-5 bg-black/60 p-3 rounded-full"
+            >
+              <X size={20} color="white" />
+            </TouchableOpacity>
+          </View>
+        </Modal>
       </View>
     );
   }
-
-  // फुल स्क्रिन म्याप लेआउट (जब isMiniMap = false हुन्छ)
   return (
     <View className="flex-1 w-full h-full">
-      <MapView
-        style={{
-          width: Dimensions.get("window").width,
-          height: Dimensions.get("window").height,
-        }}
-        initialRegion={{
-          latitude: (clientLoc.latitude + teamLoc.latitude) / 2,
-          longitude: (clientLoc.longitude + teamLoc.longitude) / 2,
-          latitudeDelta: latDelta < 0.005 ? 0.01 : latDelta,
-          longitudeDelta: lngDelta < 0.005 ? 0.01 : lngDelta,
-        }}
-      >
-        <Marker
-          coordinate={clientLoc}
-          title="Your Emergency Location"
-          pinColor="red"
-        />
-        <Marker
-          coordinate={teamLoc}
-          title={team.name || "Rescue Team"}
-          description={`Arriving in ${eta}`}
-          pinColor="blue"
-        />
-        {roadRoute.length > 0 && (
-          <Polyline
-            coordinates={roadRoute}
-            strokeColor="#00e5ff"
-            strokeWidth={5}
-          />
-        )}
-      </MapView>
+      <RenderMap />
     </View>
   );
 }
