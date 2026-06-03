@@ -17,14 +17,13 @@ import {
   Target,
   Zap,
   ShieldCheck,
-  Users,
-  Download,
-  Wrench,
-  BarChart2,
-  PlayCircle,
 } from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ReportIncident from "@/component/ReportIncident";
+import TrackTeamMap from "@/component/TrackTeamMap";
+import OfflineResourcesCard from "@/component/OfflineResourcesCard";
+import FindSheltersCard from "@/component/FindSheltersCard";
+import CommunitySafetyCard from "@/component/CommunitySafetyCard";
 
 // Type definition for counts mapping
 interface IncidentCounts {
@@ -264,127 +263,11 @@ export default function HomeScreen() {
         </View>
 
         {/* FEATURE CARDS MATRIX CONTAINER */}
-        <View className="flex-row flex-wrap justify-between">
-          {[
-            {
-              title: "Find Shelters",
-              desc: "Shelters Desc",
-              icon: MapPin,
-              location: "Naya Bazaar Shelter",
-              dist: "0.5 km",
-            },
-            {
-              title: "Rescue Teams",
-              desc: "Rescue Teams Desc",
-              icon: Users,
-              location: "Pokhara City Hall",
-              dist: "1.2 km",
-            },
-            {
-              title: "Community Safety",
-              desc: "Community Safety Desc",
-              icon: Shield,
-            },
-            { title: "Offline Resources", isOffline: true },
-          ].map((item, i) => {
-            const IconComponent = item.icon;
-            return (
-              <View
-                key={i}
-                className="w-[48.5%] bg-[#1e293b]/50 rounded-2xl mb-4 border border-white/5 overflow-hidden"
-              >
-                <View className="p-3">
-                  <View className="flex-row items-center mb-1">
-                    {IconComponent && (
-                      <IconComponent
-                        size={14}
-                        color={item.isOffline ? "#22c55e" : "#60a5fa"}
-                      />
-                    )}
-                    <Text
-                      className="text-white text-[11px] font-bold ml-2"
-                      numberOfLines={1}
-                    >
-                      {item.title}
-                    </Text>
-                  </View>
-                  <Text className="text-gray-400 text-[9px]" numberOfLines={1}>
-                    {item.desc || "Important data cached."}
-                  </Text>
-                </View>
-
-                <View className="px-2 pb-2">
-                  {item.isOffline ? (
-                    <View className="bg-[#0f172a]/60 p-2 rounded-xl">
-                      <View className="flex-row flex-wrap justify-between">
-                        {[
-                          {
-                            title: "Download maps",
-                            icon: Download,
-                            color: "#22c55e",
-                          },
-                          {
-                            title: "Mesh tools",
-                            icon: Wrench,
-                            color: "#3b82f6",
-                          },
-                          {
-                            title: "Procedures",
-                            icon: BarChart2,
-                            color: "#f59e0b",
-                          },
-                          {
-                            title: "First Aid Guides",
-                            icon: PlayCircle,
-                            color: "#ef4444",
-                          },
-                        ].map((res, idx) => (
-                          <View
-                            key={idx}
-                            className="w-[45%] items-center my-1.5"
-                          >
-                            <res.icon color={res.color} size={18} />
-                            <Text
-                              className="text-white text-[8px] mt-1 text-center"
-                              numberOfLines={1}
-                            >
-                              {res.title}
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                  ) : (
-                    <View>
-                      <View className="h-20 bg-gray-800 rounded-lg items-center justify-center">
-                        <Text className="text-gray-500 text-[10px]">
-                          Map View
-                        </Text>
-                      </View>
-                      <View className="mt-2 h-8">
-                        {item.location && (
-                          <View className="flex-row justify-between items-center">
-                            <Text
-                              className="text-white text-[8px] flex-1"
-                              numberOfLines={1}
-                            >
-                              📍 {item.location}
-                            </Text>
-                            <Text className="text-gray-400 text-[8px]">
-                              ({item.dist})
-                            </Text>
-                          </View>
-                        )}
-                        <Text className="text-orange-400 text-[8px] font-medium mt-1">
-                          Capacity: 70% Full
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-                </View>
-              </View>
-            );
-          })}
+        <View className="flex-row flex-wrap justify-between gap-y-2 gap-x-2">
+          <FindSheltersCard />
+          <TrackTeamMap isMiniMap={true} />
+          <CommunitySafetyCard />
+          <OfflineResourcesCard />
         </View>
 
         {/* NEW LAUNCH COMPONENT: REPORT INCIDENT TRIGGER MODAL BUTTON */}

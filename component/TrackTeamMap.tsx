@@ -2,15 +2,18 @@ import React, { useState, useEffect, useMemo } from "react";
 import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { io } from "socket.io-client";
+import { Users } from "lucide-react-native";
 
 export default function TrackTeamMap({
   route,
   navigation,
   isMiniMap = true,
+  item,
 }: {
-  route: any;
-  navigation: any;
+  route?: any;
+  navigation?: any;
   isMiniMap?: boolean;
+  item?: any;
 }) {
   const team = useMemo(() => route?.params?.team || {}, [route?.params?.team]);
   const clientLoc = useMemo(
@@ -21,16 +24,13 @@ export default function TrackTeamMap({
     [team.clientLatitude, team.clientLongitude],
   );
 
-  // २. रेस्क्यु टोलीको लोकेसन
   const [teamLoc, setTeamLoc] = useState({
     latitude: team.latitude || 27.7172,
     longitude: team.longitude || 85.324,
   });
 
-  // ३. रोड रुट र दुरी म्याप गर्ने
   const [roadRoute, setRoadRoute] = useState<any[]>([]);
 
-  // team.roadRoute परिवर्तन हुँदा मात्र यो सेट हुन्छ
   useEffect(() => {
     if (team.roadRoute && team.roadRoute.length > 0) {
       setRoadRoute(team.roadRoute);
@@ -44,19 +44,12 @@ export default function TrackTeamMap({
     team.distanceFromMe || team.roadDistance || "Calculating...",
   );
 
-  // 🎯 फिक्स २: सकेट डिपेन्डेन्सी लुप रोक्ने
   useEffect(() => {
     if (!team.id) return;
-
     const socket = io("http://192.168.43.132:8000");
-
     socket.on("team-location-updated", (data) => {
       if (data.teamId === team.id) {
-        setTeamLoc({
-          latitude: data.latitude,
-          longitude: data.longitude,
-        });
-
+        setTeamLoc({ latitude: data.latitude, longitude: data.longitude });
         if (
           data.route &&
           data.route.roadCoordinates &&
@@ -71,13 +64,9 @@ export default function TrackTeamMap({
               ? data.route.roadDistanceKm + " km"
               : "N/A",
           );
-        } else if (data.eta || data.roadDistance) {
-          if (data.eta) setEta(data.eta);
-          if (data.roadDistance) setDistance(data.roadDistance + " km");
         }
       }
     });
-
     return () => {
       socket.disconnect();
     };
@@ -86,26 +75,68 @@ export default function TrackTeamMap({
   const latDelta = Math.abs(clientLoc.latitude - teamLoc.latitude) * 2;
   const lngDelta = Math.abs(clientLoc.longitude - teamLoc.longitude) * 2;
 
+  // 🎯 फिक्स: झुन्डिएका र दोहोरिएका पुराना ट्यागहरू हटाएर सफा २x२ बक्स बनाइयो
+  if (isMiniMap) {
+    return (
+      <View className="w-[48.5%] bg-[#0f172a] rounded-2xl p-3 mb-4 border border-white/5 overflow-hidden">
+        <View className="p-1">
+          <View className="flex-row items-center mb-1">
+            <Users size={14} color="#60a5fa" />
+            <Text
+              className="text-white text-[11px] font-bold ml-2"
+              numberOfLines={1}
+            >
+              Rescue Teams
+            </Text>
+          </View>
+          <Text className="text-gray-400 text-[9px] mb-2" numberOfLines={1}>
+            Rescue Teams Desc
+          </Text>
+        </View>
+
+        <View className="px-1 pb-1">
+          {/* 🗺️ प्रिमियम म्याप प्लेसहोल्डर बक्स */}
+          <View className="h-20 bg-[#0f172a]/40 rounded-lg items-center justify-center ">
+            <Text className="text-gray-500 text-white font-medium tracking-wide">
+              Map View
+            </Text>
+          </View>
+
+          <View className="mt-2.5">
+            <View className="flex-row justify-between items-center">
+              <Text
+                className="text-white text-[8px] flex-1 mr-1"
+                numberOfLines={1}
+              >
+                📍 Pokhara City Hall
+              </Text>
+              <Text className="text-gray-400 text-[8px]">
+                ({(1.2).toFixed(1)} km)
+              </Text>
+            </View>
+            <Text className="text-white text-[8px] font-semibold mt-1">
+              Capacity: 70% Full
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  // फुल स्क्रिन म्याप लेआउट (जब isMiniMap = false हुन्छ)
   return (
     <View className="flex-1 w-full h-full">
       <MapView
-        style={
-          isMiniMap
-            ? { width: "100%", height: "100%" }
-            : {
-                width: Dimensions.get("window").width,
-                height: Dimensions.get("window").height,
-              }
-        }
-        // 🎯 फिक्स ३: region को सट्टा initialRegion नै राख्ने ताकि यो हल्लिरहन नखोजोस्
+        style={{
+          width: Dimensions.get("window").width,
+          height: Dimensions.get("window").height,
+        }}
         initialRegion={{
           latitude: (clientLoc.latitude + teamLoc.latitude) / 2,
           longitude: (clientLoc.longitude + teamLoc.longitude) / 2,
           latitudeDelta: latDelta < 0.005 ? 0.01 : latDelta,
           longitudeDelta: lngDelta < 0.005 ? 0.01 : lngDelta,
         }}
-        scrollEnabled={!isMiniMap}
-        zoomEnabled={!isMiniMap}
       >
         <Marker
           coordinate={clientLoc}
@@ -122,48 +153,10 @@ export default function TrackTeamMap({
           <Polyline
             coordinates={roadRoute}
             strokeColor="#00e5ff"
-            strokeWidth={isMiniMap ? 3 : 5}
+            strokeWidth={5}
           />
         )}
       </MapView>
-
-      {!isMiniMap && (
-        <View className="absolute bottom-[30px] left-[20px] right-[20px] bg-[#0f172a] p-5 rounded-[24px] border border-[#1e293b] shadow-2xl elevation-10">
-          <View className="flex-row justify-between items-start mb-2">
-            <View className="flex-1 pr-2">
-              <Text
-                className="text-white text-[16px] font-black mb-1"
-                numberOfLines={1}
-              >
-                {team.name || "Team"} is En Route
-              </Text>
-              <Text className="text-[#94a3b8] text-[13px]">
-                📞 Contact: {team.contact || team.phone || "N/A"}
-              </Text>
-            </View>
-            <View className="items-end min-w-[70px]">
-              <Text className="text-[#00e5ff] text-[18px] font-black">
-                {eta}
-              </Text>
-              <Text className="text-slate-400 text-[11px] text-right">
-                {distance}
-              </Text>
-            </View>
-          </View>
-          <Text className="text-[#22c55e] text-[12px] font-bold uppercase mb-[15px]">
-            Status: {team.status || "Active"}
-          </Text>
-          <TouchableOpacity
-            style={{ elevation: 2 }}
-            className="bg-[#1e293b] p-3 rounded-[12px] items-center active:opacity-70"
-            onPress={() => navigation.goBack()}
-          >
-            <Text className="text-white font-bold text-[13px]">
-              Back to List
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 }
