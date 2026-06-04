@@ -1,32 +1,27 @@
 import React from "react";
-import { View, Text } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { View, Text, TouchableOpacity } from "react-native";
 
-export default function FindShelters() {
+export const FindShelters = () => {
   return (
-    <View className="bg-[#0f172a] rounded-2xl p-4 w-[48.5%] mb-4">
+    <View className="bg-[#0f172a] p-4 rounded-2xl w-full  border border-slate-800">
+      {/* Header */}
       <View className="flex-row items-center mb-1">
-        <Ionicons name="location-outline" size={18} color="#5c8df6" />
-        <Text className="text-white text-[15px] font-semibold ml-1.5">
-          Find Shelters
-        </Text>
+        <Text className="text-blue-400 mr-2">📍</Text>
+        <Text className="text-white text-base font-bold">Find Shelters</Text>
       </View>
-      <Text className="text-white text-[12px] mb-3">Shelters Desc</Text>
+      <Text className="text-gray-400 text-xs mb-3">Shelters Desc</Text>
 
-      <View className="bg-[#1c2638] rounded-xl h-[100px] justify-center items-center mb-3">
-        <Text className="text-white text-[14px] font-medium">Map View</Text>
-      </View>
+      {/* Map Placeholder */}
+      <TouchableOpacity className="bg-[#111827] h-24 rounded-xl items-center justify-center mb-3 border border-gray-800">
+        <Text className="text-gray-500 text-xs">Map View</Text>
+      </TouchableOpacity>
 
-      <View className="flex-row justify-between items-center mb-1">
-        <Text className="text-white text-[11px]">
-          <FontAwesome5 name="map-pin" size={11} color="#ef4444" /> Naya Bazaar
-          Shelter
-        </Text>
-        <Text className="text-white text-[11px]">(0.5 km)</Text>
+      {/* Footer Info */}
+      <View className="flex-row justify-between items-center">
+        <Text className="text-red-400 text-xs">📍 Naya Bazaar Shelter</Text>
+        <Text className="text-gray-400 text-xs">(0.5 km)</Text>
       </View>
-      <Text className="text-white text-[11px] font-bold">
-        Capacity: 70% Full
-      </Text>
+      <Text className="text-amber-500 text-xs mt-1">Capacity: 70% Full</Text>
     </View>
   );
-}
+};

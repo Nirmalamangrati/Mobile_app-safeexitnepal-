@@ -1,29 +1,35 @@
 import React from "react";
-import { View, Text } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, TouchableOpacity } from "react-native";
 
-export default function CommunitySafety() {
+export const CommunitySafety = () => {
   return (
-    <View className="bg-[#0f172a] rounded-xl aspect-square p-4 w-[48.5%] mb-4 justify-between">
-      <View>
-        <View className="flex-row items-center mb-1">
-          <Ionicons name="shield-outline" size={18} color="#5c8df6" />
-          <Text className="text-white text-[15px] font-semibold ml-1.5">
-            Community Safety
-          </Text>
-        </View>
-        <Text className="text-white text-[12px] mb-2">
-          Community Safety Desc
-        </Text>
+    <View className="bg-[#1a2238] p-4 rounded-2xl w-full mb-4 bg-[#0f172a]">
+      {/* Header */}
+      <View className="flex-row items-center mb-1">
+        <Text className="text-blue-400 mr-2">🛡️</Text>
+        <Text className="text-white text-base font-bold">Community Safety</Text>
       </View>
+      <Text className="text-gray-400 text-xs mb-3">Community Safety Desc</Text>
 
-      <View className="bg-[#1c2638] rounded-lg h-[70px] justify-center items-center mb-2">
-        <Text className="text-white text-[14px] font-medium">Map View</Text>
+      {/* Map Placeholder */}
+      <TouchableOpacity className="bg-[#111827] h-24 rounded-xl items-center justify-center mb-3 border border-gray-800">
+        <Text className="text-gray-500 text-xs">Map View</Text>
+      </TouchableOpacity>
+
+      {/* Footer Info */}
+      <View className="flex-row justify-between items-center">
+        <Text className="text-red-400 text-xs">📍 Naya Bazaar Shelter</Text>
+        <Text className="text-gray-400 text-xs">(0.5 km)</Text>
       </View>
-
-      <Text className="text-white text-[11px] font-bold">
-        Capacity: 70% Full
-      </Text>
+      <View className="flex-row justify-between items-center">
+        <Text className="text-red-400 text-xs">📍 Naya Bazaar Shelter</Text>
+        <Text className="text-gray-400 text-xs">(0.5 km)</Text>
+      </View>
+      <View className="flex-row justify-between items-center">
+        <Text className="text-red-400 text-xs">📍 Naya Bazaar Shelter</Text>
+        <Text className="text-gray-400 text-xs">(0.5 km)</Text>
+      </View>
+      <Text className="text-amber-500 text-xs">Capacity: 70% Full</Text>
     </View>
   );
-}
+};
