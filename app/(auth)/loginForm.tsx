@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Mail, Lock, ArrowRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
-// 1. Import the modular functions instead of the default export
-import { getMessaging, getToken } from "@react-native-firebase/messaging";
 
 const BASE_URL = "https://rummage-tucking-dividend.ngrok-free.dev";
 
 // 1. ALGORITHM: LEVENSHTEIN DISTANCE (STRING SIMILARITY)
-const getLevenshteinDistance = (a, b) => {
+const getLevenshteinDistance = (a: string, b: string) => {
   if (!a || !b) return Math.abs((a || "").length - (b || "").length);
   const matrix = [];
   for (let i = 0; i <= b.length; i++) {
@@ -39,7 +37,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [emailHint, setEmailHint] = useState("");
 
-  const handleContactChange = (text) => {
+  const handleContactChange = (text: string) => {
     setContact(text);
 
     if (text.includes("@")) {
@@ -60,24 +58,13 @@ const LoginForm = () => {
   };
 
   const handleLogin = async () => {
-    // 2. ALGORITHM: REGEX PATTERN MATCHING (DETERMINISTIC FINITE AUTOMATON)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10}$/;
 
     if (emailRegex.test(contact) || phoneRegex.test(contact)) {
       try {
-        let deviceToken = "";
-        try {
-          // 2. Initialize messaging using the modular pattern and fetch token
-          const messagingInstance = getMessaging();
-          deviceToken = await getToken(messagingInstance);
-          console.log("FCM Token Generated for Login:", deviceToken);
-        } catch (fcmError) {
-          console.log(
-            "Firebase token extraction bypassed or failed:",
-            fcmError,
-          );
-        }
+        let deviceToken = "expo_go_fallback_token";
+
         const response = await fetch(`${BASE_URL}/api/auth/send-otp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -103,7 +90,7 @@ const LoginForm = () => {
           Alert.alert("Error", data.error || "Failed to send OTP.");
         }
       } catch (error) {
-        console.log("", error);
+        console.log("Login API Error:", error);
         Alert.alert("Connection Error", "Unable to connect to the server.");
       }
     } else {
@@ -185,11 +172,11 @@ const LoginForm = () => {
 
       {/* Sign Up Link */}
       <TouchableOpacity
-        onPress={() => router.push("/signupForm")}
+        onPress={() => router.push("/(auth)/signupForm")}
         className="mt-6"
       >
         <Text className="text-gray-400 text-center">
-          Don't have an account?{" "}
+          Don`t have an account?{" "}
           <Text style={{ color: "#b91c1c" }} className="font-bold">
             {"\u00A0\u00A0"} Sign Up
           </Text>

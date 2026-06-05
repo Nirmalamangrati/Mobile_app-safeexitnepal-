@@ -1,14 +1,13 @@
 import { Redirect } from "expo-router";
 import React from "react";
 
-const EntryPoint = () => {
+// नाम EntryPoint बाट बदलेर Index राखिएको छ
+export default function Index() {
   const isUserLoggedIn = false;
 
   if (isUserLoggedIn) {
-    return <Redirect href={"/home" as any} />;
+    return <Redirect href="/(tabs)/home" />;
   } else {
-    return <Redirect href={"/(auth)/login" as any} />;
+    return <Redirect href="/(auth)/loginForm" />;
   }
-};
-
-export default EntryPoint;
+}

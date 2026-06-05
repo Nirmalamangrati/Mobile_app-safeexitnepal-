@@ -213,7 +213,7 @@ const SafeExitSignup = () => {
         Alert.alert("Success ", "Account created successfully!", [
           {
             text: "OK",
-            onPress: () => router.push("/login"),
+            onPress: () => router.push("/(auth)/loginForm"),
           },
         ]);
       } else {
@@ -441,7 +441,7 @@ const SafeExitSignup = () => {
                   <ArrowRight size={16} color="white" />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => router.push("/login" as any)}
+                  onPress={() => router.push("/(auth)/loginForm")}
                   className="bg-transparent py-3 flex-row justify-center items-center mt-2"
                 >
                   <ArrowLeft size={16} color="#b91c1c" />

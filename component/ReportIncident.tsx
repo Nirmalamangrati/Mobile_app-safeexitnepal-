@@ -191,7 +191,7 @@ export default function ReportIncident(): React.JSX.Element {
 
       if (response.ok) {
         Alert.alert(
-          "🚨 Success",
+          "Success",
           "Incident Report Sent to Server! Admin will review it shortly.",
         );
 
@@ -262,7 +262,7 @@ export default function ReportIncident(): React.JSX.Element {
       {/* SECTION 1: Incident Details */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>📄 1. Incident Details</Text>
+          <Text style={styles.sectionTitle}> 1. Incident Details</Text>
         </View>
 
         <Text style={styles.label}>Incident Category *</Text>

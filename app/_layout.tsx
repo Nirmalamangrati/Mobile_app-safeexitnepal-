@@ -1,24 +1,13 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { StatusBar } from "react-native";
 
 export default function RootLayout() {
   return (
-    <>
-      <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
-
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: "#0f172a" },
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(auth)/login" />
-        <Stack.Screen name="(auth)/verifyOtp" />
-        <Stack.Screen name="(auth)/signupForm" />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-    </>
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* यी तीनवटा रूटहरू स्पष्ट रूपमा हुनैपर्छ */}
+      <Stack.Screen name="index" />
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
   );
 }
