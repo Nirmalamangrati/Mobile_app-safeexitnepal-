@@ -188,7 +188,7 @@ export default function IncidentsTab(): React.JSX.Element {
                 </Text>
               </View>
 
-              {/* 3. Interactive Location Block (म्याप आइकन र क्लिकेबल फिचर सहित) */}
+              {/* 3. Interactive Location Block  */}
               <View className="mb-2">
                 <Text className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                   Location
