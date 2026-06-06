@@ -21,6 +21,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import ReportIncident from "@/component/ReportIncident";
 import TrackTeamMap from "@/component/TrackTeamMap";
+import { FindShelters } from "@/component/FindSheltersCard";
 
 // Type definition for counts mapping
 interface IncidentCounts {
@@ -262,6 +263,7 @@ export default function HomeScreen() {
         {/* FEATURE CARDS MATRIX CONTAINER */}
         <View className="flex-row flex-wrap justify-between gap-y-2 gap-x-2">
           <TrackTeamMap isMiniMap={true} />
+          <FindShelters />
         </View>
 
         {/* NEW LAUNCH COMPONENT: REPORT INCIDENT TRIGGER MODAL BUTTON */}
