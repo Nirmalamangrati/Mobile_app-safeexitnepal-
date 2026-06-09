@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
-  Linking,
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { io } from "socket.io-client";
@@ -277,7 +276,6 @@ export default function TrackTeamMap({
           onRequestClose={() => setIsModalOpen(false)}
         >
           <View className="flex-1 justify-center items-center bg-black/60 px-4">
-            {/* Card Layout: Removed rigid width and let it hug contents nicely */}
             <View className="bg-white w-full max-w-md max-h-[75%] rounded-3xl p-6 shadow-2xl elevation-5 overflow-hidden">
               {/* Modal Header */}
               <View className="flex-row justify-between items-center mb-5 pb-3 border-b border-gray-100">
