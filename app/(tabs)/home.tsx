@@ -22,7 +22,9 @@ import { Ionicons } from "@expo/vector-icons";
 import ReportIncident from "@/component/ReportIncident";
 import TrackTeamMap from "@/component/TrackTeamMap";
 import { FindShelters } from "@/component/FindSheltersCard";
-
+import { io } from "socket.io-client";
+import shelters from "./shelters";
+const socket = io("http://192.168.43.132:8000");
 // Type definition for counts mapping
 interface IncidentCounts {
   critical: number;
@@ -32,6 +34,7 @@ interface IncidentCounts {
 }
 
 export default function HomeScreen() {
+  const [aiHazards, setAiHazards] = useState<any[]>([]);
   const [language, setLanguage] = useState("en");
   const [showReportForm, setShowReportForm] = useState(false);
   const [sosLoading, setSosLoading] = useState(false);
@@ -76,6 +79,23 @@ export default function HomeScreen() {
 
     // Load initial counters
     fetchIncidentCounts();
+    socket.on("high-density-crisis", (newCluster) => {
+      setAiHazards((prev) => {
+        const exists = prev.findIndex(
+          (c) => c.clusterId === newCluster.clusterId,
+        );
+        if (exists !== -1) {
+          const updated = [...prev];
+          updated[exists] = newCluster;
+          return updated;
+        }
+        return [...prev, newCluster];
+      });
+    });
+
+    return () => {
+      socket.off("high-density-crisis");
+    };
   }, []);
 
   // 2. SOS BUTTON LOGIC
@@ -248,22 +268,59 @@ export default function HomeScreen() {
         </View>
 
         {/* ACTIVE HAZARDS NOTIFIER */}
-        <View className="flex-row justify-between items-center mb-6 bg-[#0f172a] p-4 rounded-xl border border-white/5">
-          <View>
-            <Text className="text-white text-xl font-bold">Active Hazards</Text>
-            <Text className="text-gray-400 text-xs">
-              Hazards Desc via AI Clustering
-            </Text>
+        <View className="bg-[#111c40] rounded-xl p-4 border border-slate-800 -mt-3">
+          <View className="flex flex-row justify-between items-center mb-2">
+            <View>
+              <Text className="font-bold text-white text-sm">
+                Active Hazards
+              </Text>
+              <Text className="text-xs text-slate-400">
+                Hazards Desc via AI Clustering
+              </Text>
+            </View>
+            <View className="bg-blue-600 px-2 py-0.5 rounded">
+              <Text className="text-white text-[10px] font-black">AI</Text>
+            </View>
           </View>
-          <View className="w-12 h-12 bg-blue-600 rounded-xl items-center justify-center">
-            <Text className="text-white font-bold">AI</Text>
+          {/* AI cluster list*/}
+          <View className="space-y-2 mt-3">
+            {aiHazards.length === 0 ? (
+              <Text className="text-xs text-slate-500 italic">
+                No high-density crisis clusters detected yet.
+              </Text>
+            ) : (
+              aiHazards.map((hazard, index) => (
+                <View
+                  key={index}
+                  className="bg-red-950/20 border border-red-900/30 p-3 rounded-lg flex flex-col gap-1"
+                >
+                  <View className="flex flex-row justify-between items-center">
+                    <Text className="text-xs text-red-400 font-bold">
+                      ⚠️ Crisis Hotspot #{hazard.clusterId + 1}
+                    </Text>
+                    <View className="bg-red-600 px-1.5 py-0.5 rounded">
+                      <Text className="text-white text-[10px] font-black">
+                        {hazard.totalReports} Reports
+                      </Text>
+                    </View>
+                  </View>
+                  <Text className="text-xs text-slate-300 font-medium">
+                    {hazard.message}
+                  </Text>
+                  <Text className="text-[10px] text-slate-500">
+                    Loc: {hazard.latitude.toFixed(4)},{" "}
+                    {hazard.longitude.toFixed(4)}
+                  </Text>
+                </View>
+              ))
+            )}
           </View>
         </View>
 
         {/* FEATURE CARDS MATRIX CONTAINER */}
-        <View className="flex-row flex-wrap justify-between gap-y-2 gap-x-2">
+        <View className="flex-row flex-wrap justify-between gap-y-2 gap-x-2 mt-4">
           <TrackTeamMap isMiniMap={true} />
-          <FindShelters />
+          <FindShelters shelters={shelters} />
         </View>
 
         {/* NEW LAUNCH COMPONENT: REPORT INCIDENT TRIGGER MODAL BUTTON */}
