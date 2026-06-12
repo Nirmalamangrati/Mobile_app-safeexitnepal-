@@ -9,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import * as Location from "expo-location";
+import { router } from "expo-router";
 
 // Prop maa real shelters data receive garne banako
 export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
@@ -19,20 +20,41 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // 1. real 'shelters' data use garera KNN Search garne algorithm
+
   function calculateNearestShelter(
     userLat: number,
     userLng: number,
     realShelters: any[],
   ) {
-    if (!realShelters || realShelters.length === 0) return;
+    console.log("Admin list fetched:", realShelters);
+
+    // --- यहाँ क्लाइन्ट साइड सुरक्षा लुप थप ---
+    // यदि एडमिनबाट डेटा खाली आयो भने, स्क्रिन टेस्ट गर्न यो रैथाने डेटा प्रयोग हुन्छ
+    let finalShelters = realShelters;
+    if (!realShelters || realShelters.length === 0) {
+      finalShelters = [
+        {
+          name: "Lalitpur community center",
+          latitude: 27.659, // इमाडोल आसपासको लोकेसन
+          longitude: 85.345,
+          status: "Open",
+          shelterType: "Educational Buildings",
+        },
+      ];
+    }
+    // ---------------------------------------
 
     let closest: any = null;
     let minDistance = Infinity;
 
-    realShelters.forEach((shelter) => {
-      // backend ko Schema anusar lat & lng lai Number maa convert
-      const shelterLat = Number(shelter.lat || shelter.latitude);
-      const shelterLng = Number(shelter.lng || shelter.longitude);
+    // अब realShelters को सट्टा finalShelters मा लुप चलाउने
+    finalShelters.forEach((shelter) => {
+      const shelterLat = Number(
+        shelter.latitude || shelter.lat || shelter.location?.coordinates?.[1],
+      );
+      const shelterLng = Number(
+        shelter.longitude || shelter.lng || shelter.location?.coordinates?.[0],
+      );
 
       if (isNaN(shelterLat) || isNaN(shelterLng)) return;
 
@@ -46,7 +68,7 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
           Math.sin(dLon / 2) *
           Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c; // real km distance
+      const distance = R * c;
 
       if (distance < minDistance) {
         minDistance = distance;
@@ -66,7 +88,6 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
       });
     }
   }
-
   // 2. real GPS location tanne ra AI command chalaune function
   const handleGetLocation = async () => {
     setIsLoading(true);
@@ -211,7 +232,7 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
         </View>
       </View>
 
-      {/* Live Admin Sync Info */}
+      {/* Live Admin Sync Info
       <View className="bg-[#111827] rounded-xl p-3 border border-gray-800 mb-3">
         <View className="flex-row items-center">
           <RefreshCw size={16} color="#22c55e" />
@@ -222,10 +243,30 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
         <Text className="text-gray-400 text-xs mt-1">
           Latest shelter information fetched from MongoDB database.
         </Text>
-      </View>
+      </View> */}
 
       {/* Dynamic Map Button */}
-      <TouchableOpacity className="bg-blue-600 rounded-xl py-3 items-center">
+      {/* Dynamic Map Button */}
+      <TouchableOpacity
+        onPress={() => {
+          if (nearestShelter) {
+            router.push({
+              pathname: "/map-screen",
+              params: {
+                name: nearestShelter.name,
+                lat: nearestShelter.latitude || nearestShelter.lat,
+                lng: nearestShelter.longitude || nearestShelter.lng,
+              },
+            });
+          } else {
+            Alert.alert(
+              "Notice",
+              "Please fetch your current GPS location first.",
+            );
+          }
+        }}
+        className="bg-blue-600 rounded-xl py-3 items-center active:opacity-80"
+      >
         <Text className="text-white font-bold">Open Dynamic Map</Text>
       </TouchableOpacity>
     </View>

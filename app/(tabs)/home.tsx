@@ -23,7 +23,6 @@ import ReportIncident from "@/component/ReportIncident";
 import TrackTeamMap from "@/component/TrackTeamMap";
 import { FindShelters } from "@/component/FindSheltersCard";
 import { io } from "socket.io-client";
-import shelters from "./shelters";
 const socket = io("http://192.168.43.132:8000");
 // Type definition for counts mapping
 interface IncidentCounts {
@@ -46,7 +45,7 @@ export default function HomeScreen() {
   });
 
   const [countsLoading, setCountsLoading] = useState<boolean>(true);
-
+  const [shelterData, setShelterData] = useState([]);
   const BASE_URL = "http://192.168.43.132:8000";
   const currentUserId = "6644bc231f23ab0017f8a91c";
 
@@ -79,6 +78,21 @@ export default function HomeScreen() {
 
     // Load initial counters
     fetchIncidentCounts();
+
+    // --- यहाँ नयाँ कोड थप: एडमिन प्यानलबाट सेल्टर तान्ने ---
+    const fetchAdminShelters = async () => {
+      try {
+        // एन्ड्रोइड इमुलेटरका लागि ब्याकइन्ड पोर्ट (जस्तै ५०००) मा १०.०.२.२ राख्ने
+        const response = await fetch("http://10.0.2");
+        const data = await response.json();
+        setShelterData(data); // तानेको डेटा स्टेटमा सेभ गर्ने
+      } catch (error) {
+        console.error("मङ्गोडीबीबाट सेल्टर तान्न सकिएन:", error);
+      }
+    };
+    fetchAdminShelters(); // फङ्सन रन गर्ने
+    // -----------------------------------------------------
+
     socket.on("high-density-crisis", (newCluster) => {
       setAiHazards((prev) => {
         const exists = prev.findIndex(
@@ -97,7 +111,6 @@ export default function HomeScreen() {
       socket.off("high-density-crisis");
     };
   }, []);
-
   // 2. SOS BUTTON LOGIC
   const handleSOSPress = async () => {
     Alert.alert(
@@ -320,7 +333,7 @@ export default function HomeScreen() {
         {/* FEATURE CARDS MATRIX CONTAINER */}
         <View className="flex-row flex-wrap justify-between gap-y-2 gap-x-2 mt-4">
           <TrackTeamMap isMiniMap={true} />
-          <FindShelters shelters={shelters} />
+          <FindShelters shelters={shelterData} />
         </View>
 
         {/* NEW LAUNCH COMPONENT: REPORT INCIDENT TRIGGER MODAL BUTTON */}
