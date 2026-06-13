@@ -65,7 +65,6 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    // Permission Check + Prompt
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -75,24 +74,22 @@ export default function HomeScreen() {
         );
       }
     })();
-
-    // Load initial counters
     fetchIncidentCounts();
-
-    // --- यहाँ नयाँ कोड थप: एडमिन प्यानलबाट सेल्टर तान्ने ---
     const fetchAdminShelters = async () => {
       try {
-        // एन्ड्रोइड इमुलेटरका लागि ब्याकइन्ड पोर्ट (जस्तै ५०००) मा १०.०.२.२ राख्ने
-        const response = await fetch("http://10.0.2");
+        const response = await fetch("http://192.168.43");
+
+        if (!response.ok) {
+          throw new Error(`Server status: ${response.status}`);
+        }
+
         const data = await response.json();
-        setShelterData(data); // तानेको डेटा स्टेटमा सेभ गर्ने
+        setShelterData(data);
       } catch (error) {
-        console.error("मङ्गोडीबीबाट सेल्टर तान्न सकिएन:", error);
+        console.error("shelter can not contain from mongoDB:", error);
       }
     };
-    fetchAdminShelters(); // फङ्सन रन गर्ने
-    // -----------------------------------------------------
-
+    fetchAdminShelters();
     socket.on("high-density-crisis", (newCluster) => {
       setAiHazards((prev) => {
         const exists = prev.findIndex(
@@ -111,6 +108,7 @@ export default function HomeScreen() {
       socket.off("high-density-crisis");
     };
   }, []);
+
   // 2. SOS BUTTON LOGIC
   const handleSOSPress = async () => {
     Alert.alert(

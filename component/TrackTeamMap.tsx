@@ -9,8 +9,10 @@ import {
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { io } from "socket.io-client";
-import { Users, X, Shield, Phone, MapPin } from "lucide-react-native";
+import { Users, Shield, Phone, MapPin } from "lucide-react-native";
 const BASE_URL = "http://192.168.43.132:8000";
+const socket = io("http://192.168.43.132:8000");
+
 interface AdminDataField {
   _id: string;
   title?: string;
@@ -137,7 +139,6 @@ export default function TrackTeamMap({
       try {
         const response = await fetch("http://192.168.43.132:8000/api/teams");
         const data = await response.json();
-
         setAdminData(data); // Real data state maa set garyo
       } catch (error) {
         console.error("Data fetch garda error aayo:", error);
@@ -147,7 +148,15 @@ export default function TrackTeamMap({
     };
 
     fetchAdminData();
+    socket.on("team-updated", () => {
+      console.log("➔ [SOCKET] Teams changed, re-fetching data...");
+      fetchAdminData();
+    });
+    return () => {
+      socket.off("team-updated");
+    };
   }, []);
+
   const latDelta = Math.abs(clientLoc.latitude - teamLoc.latitude) * 2;
   const lngDelta = Math.abs(clientLoc.longitude - teamLoc.longitude) * 2;
 
@@ -225,7 +234,7 @@ export default function TrackTeamMap({
               {dynamicTeam.status || "Available"}
             </Text>
           </View>
-          {/* ३. Crew/Members */}
+          {/* 3. Crew/Members */}
           <View className="flex-row items-center justify-between bg-slate-800/40 p-2.5 rounded-xl ">
             <View className="flex-row items-center">
               <Users size={14} color="#60a5fa" />
@@ -235,7 +244,7 @@ export default function TrackTeamMap({
               {dynamicTeam.crew || dynamicTeam.members || "N/A"}
             </Text>
           </View>
-          {/* ४. Contact */}
+          {/* 4. Contact */}
           <View className="flex-row items-center justify-between bg-slate-800/40 p-2.5 rounded-xl ">
             <View className="flex-row items-center">
               <Phone size={14} color="#60a5fa" />
@@ -245,7 +254,7 @@ export default function TrackTeamMap({
               {dynamicTeam.contact || "N/A"}
             </Text>
           </View>
-          {/* ५. Location */}
+          {/* 5. Location */}
           <View className="flex-row items-center justify-between bg-slate-800/40 p-2.5 rounded-xl ">
             <View className="flex-row items-center">
               <MapPin size={14} color="#60a5fa" />
@@ -383,6 +392,18 @@ export default function TrackTeamMap({
                             item.locationName ||
                             item.address ||
                             "N/A"}
+                        </Text>
+                      </View>
+                      {/* 6. Distance  */}
+                      <View className="flex-row items-center justify-between bg-slate-800/40 p-2.5 rounded-xl ">
+                        <View className="flex-row items-center">
+                          <MapPin size={14} color="#f87171" />
+                          <Text className="text-slate-300 text-xs ml-2">
+                            Distance:
+                          </Text>
+                        </View>
+                        <Text className="text-white font-semibold text-xs">
+                          {distance}
                         </Text>
                       </View>
                     </View>

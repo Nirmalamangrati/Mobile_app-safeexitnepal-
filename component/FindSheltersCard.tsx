@@ -1,4 +1,4 @@
-import { MapPin, Clock3, Navigation, RefreshCw } from "lucide-react-native";
+import { MapPin, Clock3, Navigation,  } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   View,
@@ -20,34 +20,27 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // 1. real 'shelters' data use garera KNN Search garne algorithm
-
   function calculateNearestShelter(
     userLat: number,
     userLng: number,
     realShelters: any[],
   ) {
     console.log("Admin list fetched:", realShelters);
-
-    // --- यहाँ क्लाइन्ट साइड सुरक्षा लुप थप ---
-    // यदि एडमिनबाट डेटा खाली आयो भने, स्क्रिन टेस्ट गर्न यो रैथाने डेटा प्रयोग हुन्छ
+    // if admin bata khali data aayo vane screen test garna yo use hunxa
     let finalShelters = realShelters;
     if (!realShelters || realShelters.length === 0) {
       finalShelters = [
         {
           name: "Lalitpur community center",
-          latitude: 27.659, // इमाडोल आसपासको लोकेसन
+          latitude: 27.659,
           longitude: 85.345,
           status: "Open",
           shelterType: "Educational Buildings",
         },
       ];
     }
-    // ---------------------------------------
-
     let closest: any = null;
     let minDistance = Infinity;
-
-    // अब realShelters को सट्टा finalShelters मा लुप चलाउने
     finalShelters.forEach((shelter) => {
       const shelterLat = Number(
         shelter.latitude || shelter.lat || shelter.location?.coordinates?.[1],
@@ -104,18 +97,14 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
         setIsLoading(false);
         return;
       }
-
       // real GPS coordination tanne
       let location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
-
       const lat = location.coords.latitude;
       const lng = location.coords.longitude;
-
       // AI algorithms (KNN Search) maa data sent garne
       calculateNearestShelter(lat, lng, shelters);
-
       // cordination lai manxele bujhne address maa convert garne(Reverse Geocoding)
       let geocode = await Location.reverseGeocodeAsync({
         latitude: lat,
@@ -140,7 +129,6 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
       setIsLoading(false);
     }
   };
-
   return (
     <View className="bg-[#0f172a] p-4 rounded-2xl w-full border border-slate-800">
       {/* Header */}
@@ -149,11 +137,9 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
           Find Safe Shelters
         </Text>
       </View>
-
       <Text className="text-gray-400 text-xs mb-4">
         Discover nearby shelters with real-time availability and navigation.
       </Text>
-
       {/* Current Location Input / Button */}
       <TouchableOpacity
         onPress={handleGetLocation}
@@ -172,7 +158,6 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
         </View>
         {isLoading && <ActivityIndicator size="small" color="#60a5fa" />}
       </TouchableOpacity>
-
       {/* Shelter Status Block */}
       <View className="bg-[#111827] rounded-xl p-3 border border-gray-800 mb-3">
         <View className="flex-row justify-between items-center">
@@ -184,7 +169,6 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
               ? nearestShelter.name
               : "Tap GPS to find nearest shelter"}
           </Text>
-
           <View
             className={`px-3 py-1 rounded-full ${nearestShelter?.status === "Closed" || nearestShelter?.status === "Unsafe" ? "bg-red-500/20" : "bg-green-500/20"}`}
           >
@@ -197,14 +181,12 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
             </Text>
           </View>
         </View>
-
         <Text className="text-gray-400 text-xs mt-1">
           {nearestShelter
             ? `Type: ${nearestShelter.shelterType}`
             : "Real-time sync active with admin panel"}
         </Text>
       </View>
-
       {/* ETA & Distance Row */}
       <View className="flex-row justify-between mb-3">
         {/* ETA Box */}
@@ -218,7 +200,6 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
           </Text>
           <Text className="text-gray-400 text-xs"> Walking</Text>
         </View>
-
         {/* Distance Box */}
         <View className="bg-[#111827] flex-1 ml-2 p-3 rounded-xl border border-gray-800">
           <View className="flex-row items-center mb-1">
@@ -231,22 +212,6 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
           <Text className="text-gray-400 text-xs">From your location</Text>
         </View>
       </View>
-
-      {/* Live Admin Sync Info
-      <View className="bg-[#111827] rounded-xl p-3 border border-gray-800 mb-3">
-        <View className="flex-row items-center">
-          <RefreshCw size={16} color="#22c55e" />
-          <Text className="text-green-400 ml-2 text-sm font-semibold">
-            Live Admin Data Synced
-          </Text>
-        </View>
-        <Text className="text-gray-400 text-xs mt-1">
-          Latest shelter information fetched from MongoDB database.
-        </Text>
-      </View> */}
-
-      {/* Dynamic Map Button */}
-      {/* Dynamic Map Button */}
       <TouchableOpacity
         onPress={() => {
           if (nearestShelter) {
