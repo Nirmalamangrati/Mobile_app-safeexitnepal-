@@ -168,5 +168,4 @@ const LoginForm = () => {
     </View>
   );
 };
-
 export default LoginForm;
