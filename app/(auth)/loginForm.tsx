@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Mail, Lock, ArrowRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
-
 const BASE_URL = "https://rummage-tucking-dividend.ngrok-free.dev";
-
 // 1. ALGORITHM: LEVENSHTEIN DISTANCE (STRING SIMILARITY)
 const getLevenshteinDistance = (a: string, b: string) => {
   if (!a || !b) return Math.abs((a || "").length - (b || "").length);
@@ -30,20 +28,16 @@ const getLevenshteinDistance = (a: string, b: string) => {
   }
   return matrix[b.length][a.length];
 };
-
 const LoginForm = () => {
   const router = useRouter();
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
   const [emailHint, setEmailHint] = useState("");
-
   const handleContactChange = (text: string) => {
     setContact(text);
-
     if (text.includes("@")) {
       const domain = text.split("@")[1];
       const commonDomains = ["gmail.com", "yahoo.com", "outlook.com"];
-
       if (domain) {
         for (let d of commonDomains) {
           const distance = getLevenshteinDistance(domain, d);
@@ -56,15 +50,12 @@ const LoginForm = () => {
     }
     setEmailHint("");
   };
-
   const handleLogin = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10}$/;
-
     if (emailRegex.test(contact) || phoneRegex.test(contact)) {
       try {
         let deviceToken = "expo_go_fallback_token";
-
         const response = await fetch(`${BASE_URL}/api/auth/send-otp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -74,9 +65,7 @@ const LoginForm = () => {
             fcmToken: deviceToken,
           }),
         });
-
         const data = await response.json();
-
         if (response.ok) {
           Alert.alert(
             "Success",
@@ -100,7 +89,6 @@ const LoginForm = () => {
       );
     }
   };
-
   return (
     <View className="flex-1 bg-[#0f172a] justify-center p-6">
       <View className="mb-8">
@@ -109,7 +97,6 @@ const LoginForm = () => {
           Login with your verified email or phone
         </Text>
       </View>
-
       {/* Input: Email or Phone */}
       <View className="bg-[#1e293b] flex-row items-center p-4 rounded-2xl mb-1 border border-white/5">
         <Mail color="#b91c1c" size={20} />
@@ -123,7 +110,6 @@ const LoginForm = () => {
           autoCapitalize="none"
         />
       </View>
-
       {/* Email Hint Display */}
       {emailHint ? (
         <TouchableOpacity
@@ -144,7 +130,6 @@ const LoginForm = () => {
       ) : (
         <View className="mb-3" />
       )}
-
       {/* Input: Password */}
       <View className="bg-[#1e293b] flex-row items-center p-4 rounded-2xl mb-6 border border-white/5">
         <Lock color="#b91c1c" size={20} />
@@ -157,7 +142,6 @@ const LoginForm = () => {
           onChangeText={setPassword}
         />
       </View>
-
       {/* Login Button */}
       <TouchableOpacity
         onPress={handleLogin}
@@ -169,7 +153,6 @@ const LoginForm = () => {
         </View>
         <ArrowRight color="white" size={20} />
       </TouchableOpacity>
-
       {/* Sign Up Link */}
       <TouchableOpacity
         onPress={() => router.push("/(auth)/signupForm")}
