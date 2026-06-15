@@ -23,6 +23,7 @@ import ReportIncident from "@/component/ReportIncident";
 import TrackTeamMap from "@/component/TrackTeamMap";
 import { FindShelters } from "@/component/FindSheltersCard";
 import { io } from "socket.io-client";
+import { OfflineResources } from "@/component/OfflineResourcesCard";
 const socket = io("http://192.168.43.132:8000");
 // Type definition for counts mapping
 interface IncidentCounts {
@@ -332,6 +333,7 @@ export default function HomeScreen() {
         <View className="flex-row flex-wrap justify-between gap-y-2 gap-x-2 mt-4">
           <TrackTeamMap isMiniMap={true} />
           <FindShelters shelters={shelterData} />
+          <OfflineResources />
         </View>
 
         {/* NEW LAUNCH COMPONENT: REPORT INCIDENT TRIGGER MODAL BUTTON */}
