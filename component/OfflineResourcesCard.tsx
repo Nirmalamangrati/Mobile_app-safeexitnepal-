@@ -5,25 +5,29 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Linking,
+  Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
+import * as Sharing from "expo-sharing";
+import { Paths, getInfoAsync, downloadAsync } from "expo-file-system";
 
-//  फायरबेस क्र्यास हुनबाट जोगाउन सेफ इम्पोट र चेक
-let messaging: any = null;
-try {
-  messaging = require("@react-native-firebase/messaging").default;
-} catch (e) {
-  console.log("Firebase native module not linked yet.");
-}
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
-// Data Structure
 interface OfflineResource {
   _id: string;
   title: string;
   version: string;
   size: string;
-  resourceType: "Map" | "Tool" | "Procedure" | "Guide";
+  resourceType: "Map" | "Tool" | "Procedure" | "Guide" | "Manual" | "Image";
   status: "Synced" | "Update Available" | "Downloaded";
   fileUrl: string;
 }
@@ -34,24 +38,29 @@ export const OfflineResources: React.FC = () => {
   const [resources, setResources] = useState<OfflineResource[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  //  1. Push Notification (सुरक्षित तरिकाले चेक गरेर मात्र चल्ने)
   useEffect(() => {
-    // यदि एन्ड्रोइडमा फायरबेस बिल्ड भएको छैन भने यो कोड चुपचाप बस्छ, एप क्र्यास गर्दैन
-    if (!messaging) {
-      console.log(
-        "Skipping notification setup: Firebase native module missing.",
-      );
-      return;
-    }
-
     const setupNotifications = async () => {
       try {
+        const messagingModule =
+          await import("@react-native-firebase/messaging");
+        const messaging = messagingModule.default;
+
         const authStatus = await messaging().requestPermission();
         const enabled =
           authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
           authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
         if (enabled) {
+          await Notifications.requestPermissionsAsync();
+
+          if (Platform.OS === "android") {
+            await Notifications.setNotificationChannelAsync("default", {
+              name: "Default",
+              importance: Notifications.AndroidImportance.MAX,
+              lightColor: "#FF231F7A",
+            });
+          }
+
           const token = await messaging().getToken();
           if (token) {
             await fetch(`${BACKEND_URL}/api/resources/save-token`, {
@@ -61,25 +70,42 @@ export const OfflineResources: React.FC = () => {
             });
           }
         }
+
+        const unsubscribe = messaging().onMessage(
+          async (remoteMessage: any) => {
+            console.log("Foreground message received:", remoteMessage);
+
+            await Notifications.scheduleNotificationAsync({
+              content: {
+                title: remoteMessage.notification?.title || "New Update 📂",
+                body:
+                  remoteMessage.notification?.body ||
+                  "A new file is available.",
+                data: remoteMessage.data,
+              },
+              trigger: null,
+            });
+
+            fetchFromServer();
+          },
+        );
+
+        return unsubscribe;
       } catch (err) {
-        console.error("Notification setup error:", err);
+        console.log("Firebase native module missing or error occurred:", err);
       }
     };
 
-    setupNotifications();
+    const init = async () => {
+      const unsub = await setupNotifications();
+      return () => {
+        if (unsub) unsub();
+      };
+    };
 
-    const unsubscribe = messaging().onMessage(async (remoteMessage: any) => {
-      Alert.alert(
-        remoteMessage.notification?.title || "New Update",
-        remoteMessage.notification?.body || "A new file is available.",
-      );
-      fetchFromServer();
-    });
-
-    return unsubscribe;
+    init();
   }, []);
 
-  //  2. Fetch Data and Cache to AsyncStorage
   const fetchFromServer = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/resources`);
@@ -109,10 +135,27 @@ export const OfflineResources: React.FC = () => {
     fetchFromServer();
   }, []);
 
-  //  3. Download File and Update Local Status
   const handleDownloadFile = async (id: string, fileUrl: string) => {
+    const extension = fileUrl.split(".").pop();
+
+    // Expo SDK 54 को नयाँ नियम अनुसार Paths.document को प्रयोग गरियो:
+    const localUri = `${Paths.document}/${id}.${extension}`;
+
     try {
-      await Linking.openURL(fileUrl);
+      const fileInfo = await getInfoAsync(localUri);
+
+      if (fileInfo.exists) {
+        await Sharing.shareAsync(localUri);
+        return;
+      }
+
+      Alert.alert(
+        "Downloading",
+        "Please wait while the file is downloading...",
+      );
+
+      const { uri } = await downloadAsync(fileUrl, localUri);
+      await Sharing.shareAsync(uri);
 
       const updated = resources.map((res) =>
         res._id === id ? { ...res, status: "Downloaded" as const } : res,
@@ -120,13 +163,15 @@ export const OfflineResources: React.FC = () => {
       setResources(updated);
       await AsyncStorage.setItem("cached_resources", JSON.stringify(updated));
     } catch (error) {
-      Alert.alert("Error", "Could not open or download the file.");
+      Alert.alert("Error", "Could not download or open the file offline.");
+      console.error(error);
     }
   };
 
   const filteredResources = resources.filter(
     (res) => res.resourceType === selectedCategory,
   );
+
   return (
     <ScrollView className="bg-[#0f172a] flex-1 p-5 p-4 rounded-2xl w-full border border-slate-800">
       <Text className="text-2xl font-bold text-white mt-5">
@@ -134,10 +179,9 @@ export const OfflineResources: React.FC = () => {
       </Text>
       <Text className="text-gray-400 mb-5">Important data cached.</Text>
 
-      {/*  4 Boxes Grid Layout */}
       <View className="flex-row flex-wrap justify-between mb-8">
         <TouchableOpacity
-          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl   items-center mb-4"
+          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl items-center mb-4"
           onPress={() => setSelectedCategory("Map")}
         >
           <Text className="text-2xl mb-1">📥</Text>
@@ -147,7 +191,7 @@ export const OfflineResources: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl  items-center mb-4"
+          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl items-center mb-4"
           onPress={() => setSelectedCategory("Tool")}
         >
           <Text className="text-2xl mb-1">🔧</Text>
@@ -157,7 +201,7 @@ export const OfflineResources: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl  items-center mb-4"
+          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl items-center mb-4"
           onPress={() => setSelectedCategory("Procedure")}
         >
           <Text className="text-2xl mb-1">📊</Text>
@@ -167,7 +211,7 @@ export const OfflineResources: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl  items-center mb-4"
+          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl items-center mb-4"
           onPress={() => setSelectedCategory("Guide")}
         >
           <Text className="text-2xl mb-1">▶️</Text>
@@ -175,11 +219,30 @@ export const OfflineResources: React.FC = () => {
             First Aid Guides
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl items-center mb-4"
+          onPress={() => setSelectedCategory("Manual")}
+        >
+          <Text className="text-2xl mb-1">📖</Text>
+          <Text className="text-white text-sm text-center font-semibold">
+            Manual
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          className="w-[47%] bg-[#0f172a] p-5 rounded-2xl items-center mb-4"
+          onPress={() => setSelectedCategory("Image")}
+        >
+          <Text className="text-2xl mb-1">📷</Text>
+          <Text className="text-white text-sm text-center font-semibold">
+            Image
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      {/*  Dynamic File List View */}
       {selectedCategory && (
-        <View className="bg-[#0f172a] p-4 rounded-2xl w-full  mb-10">
+        <View className="bg-[#0f172a] p-4 rounded-2xl w-full mb-10">
           <Text className="text-white text-base font-bold mb-3">
             Available Files ({selectedCategory}):
           </Text>
@@ -192,14 +255,18 @@ export const OfflineResources: React.FC = () => {
             filteredResources.map((res) => (
               <View
                 key={res._id}
-                className="flex-row justify-between items-center py-3 "
+                className="flex-row justify-between items-center py-3"
               >
                 <View className="flex-1 pr-2">
                   <Text className="text-white text-sm font-bold">
                     {res.title} ({res.size})
                   </Text>
                   <Text
-                    className={`text-xs mt-1 ${res.status === "Downloaded" ? "text-green-500" : "text-amber-500"}`}
+                    className={`text-xs mt-1 ${
+                      res.status === "Downloaded"
+                        ? "text-green-500"
+                        : "text-amber-500"
+                    }`}
                   >
                     Status: {res.status}
                   </Text>
@@ -210,7 +277,11 @@ export const OfflineResources: React.FC = () => {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  className={`py-1.5 px-3 rounded-md ${res.status === "Downloaded" ? "bg-green-500" : "bg-amber-500"}`}
+                  className={`py-1.5 px-3 rounded-md ${
+                    res.status === "Downloaded"
+                      ? "bg-green-500"
+                      : "bg-amber-500"
+                  }`}
                   onPress={() => handleDownloadFile(res._id, res.fileUrl)}
                 >
                   <Text className="text-white text-xs font-bold">
