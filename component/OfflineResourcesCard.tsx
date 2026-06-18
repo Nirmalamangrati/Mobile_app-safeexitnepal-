@@ -50,7 +50,6 @@ export const OfflineResources: React.FC = () => {
           authStatus === messaging.AuthorizationStatus.PROVISIONAL;
         if (enabled) {
           await Notifications.requestPermissionsAsync();
-
           if (Platform.OS === "android") {
             await Notifications.setNotificationChannelAsync("default", {
               name: "Default",
@@ -130,10 +129,7 @@ export const OfflineResources: React.FC = () => {
 
   const handleDownloadFile = async (id: string, fileUrl: string) => {
     const extension = fileUrl.split(".").pop();
-
-    // Expo SDK 54 को नयाँ नियम अनुसार Paths.document को प्रयोग गरियो:
     const localUri = `${Paths.document}/${id}.${extension}`;
-
     try {
       const fileInfo = await getInfoAsync(localUri);
 

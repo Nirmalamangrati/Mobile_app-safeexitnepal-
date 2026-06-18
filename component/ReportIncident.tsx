@@ -223,7 +223,6 @@ export default function ReportIncident(): React.JSX.Element {
       setSubmitting(false);
     }
   };
-
   return (
     <ScrollView
       style={styles.container}
@@ -241,9 +240,7 @@ export default function ReportIncident(): React.JSX.Element {
           <Text style={styles.helpSub}>Email: info@safeexitnepal.org</Text>
         </View>
       </View>
-
       <Text style={styles.pageTitle}>Report Incident</Text>
-
       {/* CONFIDENTIALITY NOTICE */}
       <View style={styles.infoBox}>
         <Text style={styles.infoText}>
@@ -264,7 +261,6 @@ export default function ReportIncident(): React.JSX.Element {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}> 1. Incident Details</Text>
         </View>
-
         <Text style={styles.label}>Incident Category *</Text>
         <View style={styles.pickerContainer}>
           <Picker
@@ -297,7 +293,6 @@ export default function ReportIncident(): React.JSX.Element {
             <Picker.Item label="Other" value="other" />
           </Picker>
         </View>
-
         <Text style={styles.label}>Date & Time of Incident *</Text>
         <TextInput
           style={styles.input}
@@ -305,7 +300,6 @@ export default function ReportIncident(): React.JSX.Element {
           value={incidentDate}
           onChangeText={setIncidentDate}
         />
-
         <Text style={styles.label}>Location of Incident *</Text>
         <TextInput
           style={styles.input}
@@ -313,7 +307,6 @@ export default function ReportIncident(): React.JSX.Element {
           value={location}
           onChangeText={setLocation}
         />
-
         <Text style={styles.label}>Detailed Description *</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
@@ -332,7 +325,6 @@ export default function ReportIncident(): React.JSX.Element {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>👤 2. Suspect Information</Text>
         </View>
-
         <Text style={styles.label}>Name (Optional)</Text>
         <TextInput
           style={styles.input}
@@ -340,7 +332,6 @@ export default function ReportIncident(): React.JSX.Element {
           value={suspectName}
           onChangeText={setSuspectName}
         />
-
         <View style={styles.row}>
           <View style={{ flex: 1, marginRight: 10 }}>
             <Text style={styles.label}>Estimated Age</Text>
@@ -424,11 +415,9 @@ export default function ReportIncident(): React.JSX.Element {
           className="border border-dashed border-blue-500 rounded-xl p-6 items-center bg-slate-900 mt-2 w-full justify-center"
         >
           <Text className="text-3xl mb-2">📤</Text>
-
           <Text className="text-blue-500 font-semibold text-center text-sm">
             {attachedFile ? attachedFile.name : "Choose file or drag here"}
           </Text>
-
           <Text
             className={`text-xs mt-1 text-center ${attachedFile ? "text-green-500" : "text-gray-400"}`}
           >
@@ -437,7 +426,6 @@ export default function ReportIncident(): React.JSX.Element {
               : "(JPG, PNG, MP4, PDF | Max Size 10MB)"}
           </Text>
         </TouchableOpacity>
-
         {/* VISUAL LAYOUT PREVIEW STRINGS BLOCK INTERFACE RUN DISPLAY SECTION CHECK */}
         {attachedFile && attachedFile.mimeType?.startsWith("image/") && (
           <View className="items-center mt-3 w-full justify-center">
@@ -466,7 +454,6 @@ export default function ReportIncident(): React.JSX.Element {
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}> Submit Report</Text>
       </TouchableOpacity>
-
       <TouchableOpacity
         style={styles.cancelButton}
         onPress={() => alert("Cancelled")}
@@ -476,7 +463,6 @@ export default function ReportIncident(): React.JSX.Element {
     </ScrollView>
   );
 }
-
 // STYLESHEET DESIGN
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f4f6f9", padding: 15 },
