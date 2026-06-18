@@ -44,12 +44,10 @@ export const OfflineResources: React.FC = () => {
         const messagingModule =
           await import("@react-native-firebase/messaging");
         const messaging = messagingModule.default;
-
         const authStatus = await messaging().requestPermission();
         const enabled =
           authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
           authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
         if (enabled) {
           await Notifications.requestPermissionsAsync();
 
@@ -60,7 +58,6 @@ export const OfflineResources: React.FC = () => {
               lightColor: "#FF231F7A",
             });
           }
-
           const token = await messaging().getToken();
           if (token) {
             await fetch(`${BACKEND_URL}/api/resources/save-token`, {
@@ -70,11 +67,9 @@ export const OfflineResources: React.FC = () => {
             });
           }
         }
-
         const unsubscribe = messaging().onMessage(
           async (remoteMessage: any) => {
             console.log("Foreground message received:", remoteMessage);
-
             await Notifications.scheduleNotificationAsync({
               content: {
                 title: remoteMessage.notification?.title || "New Update 📂",
@@ -89,13 +84,11 @@ export const OfflineResources: React.FC = () => {
             fetchFromServer();
           },
         );
-
         return unsubscribe;
       } catch (err) {
         console.log("Firebase native module missing or error occurred:", err);
       }
     };
-
     const init = async () => {
       const unsub = await setupNotifications();
       return () => {
