@@ -77,12 +77,11 @@ export default function HomeScreen() {
     fetchIncidentCounts();
     const fetchAdminShelters = async () => {
       try {
-        const response = await fetch("http://192.168.43");
+        const response = await fetch("http://192.168.43.132:8000/api/shelter");
 
         if (!response.ok) {
           throw new Error(`Server status: ${response.status}`);
         }
-
         const data = await response.json();
         setShelterData(data);
       } catch (error) {
@@ -108,66 +107,6 @@ export default function HomeScreen() {
       socket.off("high-density-crisis");
     };
   }, []);
-
-  // // 2. SOS BUTTON LOGIC
-  // const handleSOSPress = async () => {
-  //   Alert.alert(
-  //     "TRIGGER EMERGENCY SOS?",
-  //     "Are you sure you want to send an SOS alert to your emergency contacts and authorities? This action cannot be undone.",
-  //     [
-  //       { text: "Cancel", style: "cancel" },
-  //       {
-  //         text: "YES, SEND SOS",
-  //         style: "destructive",
-  //         onPress: async () => {
-  //           setSosLoading(true);
-  //           try {
-  //             let currentPosition = await Location.getCurrentPositionAsync({
-  //               accuracy: Location.Accuracy.High,
-  //             });
-
-  //             const { latitude, longitude } = currentPosition.coords;
-  //             console.log("GPS Coordinates Pulled:", latitude, longitude);
-
-  //             const payload = {
-  //               userId: currentUserId,
-  //               location: {
-  //                 lat: latitude,
-  //                 lng: longitude,
-  //               },
-  //             };
-
-  //             const response = await fetch(`${BASE_URL}/api/user/trigger`, {
-  //               method: "POST",
-  //               headers: { "Content-Type": "application/json" },
-  //               body: JSON.stringify(payload),
-  //             });
-
-  //             const data = await response.json();
-
-  //             if (response.ok) {
-  //               Alert.alert(
-  //                 " SOS ACTIVATED",
-  //                 "Your emergency contacts have been sent an alarm notification. If no one responds within 30 seconds, the Nepal Police and admin will be automatically alerted.",
-  //               );
-  //             } else {
-  //               Alert.alert("Error", data.error || "SOS trigger failed.");
-  //             }
-  //           } catch (error) {
-  //             console.log("SOS Activation Error:", error);
-  //             Alert.alert(
-  //               "Network Error",
-  //               "Backend cannot be connected with server. Please try again later.",
-  //             );
-  //           } finally {
-  //             setSosLoading(false);
-  //           }
-  //         },
-  //       },
-  //     ],
-  //   );
-  // };
-
   if (countsLoading) {
     return (
       <View className="flex-1 bg-[#020617] justify-center items-center">
@@ -175,7 +114,6 @@ export default function HomeScreen() {
       </View>
     );
   }
-
   return (
     <ScrollView className="flex-1 bg-[#020617]">
       {/* HEADER */}
