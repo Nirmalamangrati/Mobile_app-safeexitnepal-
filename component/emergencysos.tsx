@@ -70,28 +70,22 @@ export const triggerUltimateSOS = async (config: {
       //yaa number chnage garne (police number rakhne aafno phone number ko sato)
       phone: "+9779825716885",
     };
-
     console.log(" Accessing Satellites for GPS Lock...");
     const locationPromise = Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.BestForNavigation,
     });
-
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("GPS_TIMEOUT")), 5000),
     );
-
     const currentPosition = (await Promise.race([
       locationPromise,
       timeoutPromise,
     ])) as Location.LocationObject;
     const { latitude, longitude } = currentPosition.coords;
-
     // clickable map routing targets
     const mapsLink = `https://google.com{latitude},${longitude}`;
-
     let optimizedHub = DEFAULT_BACKUP_HUB;
     let shortestDistance = Infinity;
-
     if (NEPAL_SECURITY_HUBS.length > 0) {
       for (const hub of NEPAL_SECURITY_HUBS) {
         const distance = getStrictDistanceKM(
@@ -113,11 +107,9 @@ export const triggerUltimateSOS = async (config: {
         DEFAULT_BACKUP_HUB.lng,
       );
     }
-
     const netInfo = await NetInfo.fetch();
     const abortController = new AbortController();
     const networkTimeout = setTimeout(() => abortController.abort(), 2500);
-
     if (netInfo.isConnected && netInfo.isInternetReachable !== false) {
       try {
         const response = await fetch(`${baseUrl}/api/user/trigger`, {
@@ -130,9 +122,7 @@ export const triggerUltimateSOS = async (config: {
           }),
           signal: abortController.signal,
         });
-
         clearTimeout(networkTimeout);
-
         if (response.ok) {
           retryDelay = 1000;
           Alert.alert(
@@ -148,7 +138,6 @@ export const triggerUltimateSOS = async (config: {
         );
       }
     }
-
     console.log("Hardware Native SMS Controller Active");
     const isHardwareReady = await SMS.isAvailableAsync();
     if (isHardwareReady) {
@@ -187,7 +176,6 @@ export const triggerUltimateSOS = async (config: {
 // 3. MAIN EXPORTED VISUAL COMPONENT
 export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
   const [sosLoading, setSosLoading] = useState(false);
-
   // Local state references for true setup variables fetched from your user document fields
   const [realContacts, setRealContacts] = useState({
     contact1: "",
