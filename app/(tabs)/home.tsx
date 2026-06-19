@@ -24,6 +24,7 @@ import TrackTeamMap from "@/component/TrackTeamMap";
 import { FindShelters } from "@/component/FindSheltersCard";
 import { io } from "socket.io-client";
 import { OfflineResources } from "@/component/OfflineResourcesCard";
+import EmergencySOS from "@/component/emergencysos";
 const socket = io("http://192.168.43.132:8000");
 // Type definition for counts mapping
 interface IncidentCounts {
@@ -37,7 +38,6 @@ export default function HomeScreen() {
   const [aiHazards, setAiHazards] = useState<any[]>([]);
   const [language, setLanguage] = useState("en");
   const [showReportForm, setShowReportForm] = useState(false);
-  const [sosLoading, setSosLoading] = useState(false);
   const [counts, setCounts] = useState<IncidentCounts>({
     critical: 0,
     high: 0,
@@ -49,7 +49,6 @@ export default function HomeScreen() {
   const [shelterData, setShelterData] = useState([]);
   const BASE_URL = "http://192.168.43.132:8000";
   const currentUserId = "6644bc231f23ab0017f8a91c";
-
   // 1. Fetch Dynamic Incident Counts from Backend
   const fetchIncidentCounts = async () => {
     try {
@@ -110,64 +109,64 @@ export default function HomeScreen() {
     };
   }, []);
 
-  // 2. SOS BUTTON LOGIC
-  const handleSOSPress = async () => {
-    Alert.alert(
-      "TRIGGER EMERGENCY SOS?",
-      "Are you sure you want to send an SOS alert to your emergency contacts and authorities? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "YES, SEND SOS",
-          style: "destructive",
-          onPress: async () => {
-            setSosLoading(true);
-            try {
-              let currentPosition = await Location.getCurrentPositionAsync({
-                accuracy: Location.Accuracy.High,
-              });
+  // // 2. SOS BUTTON LOGIC
+  // const handleSOSPress = async () => {
+  //   Alert.alert(
+  //     "TRIGGER EMERGENCY SOS?",
+  //     "Are you sure you want to send an SOS alert to your emergency contacts and authorities? This action cannot be undone.",
+  //     [
+  //       { text: "Cancel", style: "cancel" },
+  //       {
+  //         text: "YES, SEND SOS",
+  //         style: "destructive",
+  //         onPress: async () => {
+  //           setSosLoading(true);
+  //           try {
+  //             let currentPosition = await Location.getCurrentPositionAsync({
+  //               accuracy: Location.Accuracy.High,
+  //             });
 
-              const { latitude, longitude } = currentPosition.coords;
-              console.log("GPS Coordinates Pulled:", latitude, longitude);
+  //             const { latitude, longitude } = currentPosition.coords;
+  //             console.log("GPS Coordinates Pulled:", latitude, longitude);
 
-              const payload = {
-                userId: currentUserId,
-                location: {
-                  lat: latitude,
-                  lng: longitude,
-                },
-              };
+  //             const payload = {
+  //               userId: currentUserId,
+  //               location: {
+  //                 lat: latitude,
+  //                 lng: longitude,
+  //               },
+  //             };
 
-              const response = await fetch(`${BASE_URL}/api/user/trigger`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              });
+  //             const response = await fetch(`${BASE_URL}/api/user/trigger`, {
+  //               method: "POST",
+  //               headers: { "Content-Type": "application/json" },
+  //               body: JSON.stringify(payload),
+  //             });
 
-              const data = await response.json();
+  //             const data = await response.json();
 
-              if (response.ok) {
-                Alert.alert(
-                  " SOS ACTIVATED",
-                  "Your emergency contacts have been sent an alarm notification. If no one responds within 30 seconds, the Nepal Police and admin will be automatically alerted.",
-                );
-              } else {
-                Alert.alert("Error", data.error || "SOS trigger failed.");
-              }
-            } catch (error) {
-              console.log("SOS Activation Error:", error);
-              Alert.alert(
-                "Network Error",
-                "Backend cannot be connected with server. Please try again later.",
-              );
-            } finally {
-              setSosLoading(false);
-            }
-          },
-        },
-      ],
-    );
-  };
+  //             if (response.ok) {
+  //               Alert.alert(
+  //                 " SOS ACTIVATED",
+  //                 "Your emergency contacts have been sent an alarm notification. If no one responds within 30 seconds, the Nepal Police and admin will be automatically alerted.",
+  //               );
+  //             } else {
+  //               Alert.alert("Error", data.error || "SOS trigger failed.");
+  //             }
+  //           } catch (error) {
+  //             console.log("SOS Activation Error:", error);
+  //             Alert.alert(
+  //               "Network Error",
+  //               "Backend cannot be connected with server. Please try again later.",
+  //             );
+  //           } finally {
+  //             setSosLoading(false);
+  //           }
+  //         },
+  //       },
+  //     ],
+  //   );
+  // };
 
   if (countsLoading) {
     return (
@@ -201,25 +200,7 @@ export default function HomeScreen() {
       {/* BODY PANEL */}
       <View className="p-4">
         {/* EMERGENCY SOS BUTTON */}
-        <View className="items-center mb-4">
-          <TouchableOpacity
-            onPress={handleSOSPress}
-            disabled={sosLoading}
-            className="bg-red-600 px-8 py-4 rounded-full flex-row items-center active:opacity-80 w-full justify-center"
-            style={{ opacity: sosLoading ? 0.6 : 1 }}
-          >
-            {sosLoading ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <>
-                <Ionicons name="alert-circle" size={22} color="white" />
-                <Text className="text-white text-lg font-bold ml-2">
-                  Emergency SOS
-                </Text>
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
+        <EmergencySOS userId={currentUserId} baseUrl={BASE_URL} />
 
         {/* GPS LOCATION FIELD */}
         <View className="bg-[#0f172a] flex-row items-center p-3 rounded-xl mb-4 h-12 border border-white/5">
@@ -308,7 +289,7 @@ export default function HomeScreen() {
                 >
                   <View className="flex flex-row justify-between items-center">
                     <Text className="text-xs text-red-400 font-bold">
-                      ⚠️ Crisis Hotspot #{hazard.clusterId + 1}
+                      Crisis Hotspot #{hazard.clusterId + 1}
                     </Text>
                     <View className="bg-red-600 px-1.5 py-0.5 rounded">
                       <Text className="text-white text-[10px] font-black">
