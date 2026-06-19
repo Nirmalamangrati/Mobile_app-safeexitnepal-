@@ -43,11 +43,9 @@ export default function ReportIncident(): React.JSX.Element {
   // Section 5 States: Attached Files
   const [attachedFile, setAttachedFile] =
     useState<DocumentPicker.DocumentPickerAsset | null>(null);
-
   // Section 6 States: Terms and Declaration
   const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
-
   useEffect(() => {
     async function getLiveLocation() {
       setLocLoading(true);
@@ -61,20 +59,17 @@ export default function ReportIncident(): React.JSX.Element {
         setLocLoading(false);
         return;
       }
-
       let currentLoc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
-
       setLatitude(currentLoc.coords.latitude);
       setLongitude(currentLoc.coords.longitude);
       setLocLoading(false);
     }
-
     getLiveLocation();
   }, []);
 
-  // 📁 Gallery kholera Multi-format files pick garne function:
+  //  Gallery kholera Multi-format files pick garne function:
   const handlePickFile = async (): Promise<void> => {
     try {
       const permission =
@@ -129,7 +124,6 @@ export default function ReportIncident(): React.JSX.Element {
       );
       return;
     }
-
     if (!agreeTerms) {
       Alert.alert(
         "Declaration Statement",
@@ -137,10 +131,8 @@ export default function ReportIncident(): React.JSX.Element {
       );
       return;
     }
-
     setSubmitting(true);
     const formData = new FormData();
-
     // Text details append parameters map:
     formData.append("incidentCategory", incidentCategory);
     formData.append("incidentType", incidentType);
@@ -167,7 +159,7 @@ export default function ReportIncident(): React.JSX.Element {
       }),
     );
 
-    // 📁 File append processing
+    //  File append processing
     if (attachedFile) {
       formData.append("file", {
         uri: attachedFile.uri,
@@ -175,10 +167,8 @@ export default function ReportIncident(): React.JSX.Element {
         type: attachedFile.mimeType || "application/octet-stream",
       } as any);
     }
-
     try {
       console.log("➔ [FRONTEND DISPATCH] Submitting Form with File data...");
-
       const response = await fetch("http://192.168.43.132:8000/api/incidents", {
         method: "POST",
         body: formData,
