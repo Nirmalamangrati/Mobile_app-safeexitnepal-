@@ -28,11 +28,11 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="shelters"
+        name="weather"
         options={{
-          title: "Shelters",
+          title: "Weather",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="business" size={24} color={color} />
+            <Ionicons name="cloudy" size={24} color={color} />
           ),
         }}
       />

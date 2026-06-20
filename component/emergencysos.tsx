@@ -181,7 +181,6 @@ export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
     contact1: "",
     contact2: "",
   });
-
   useEffect(() => {
     const syncSecurityHubsFromServer = async () => {
       try {
@@ -201,7 +200,6 @@ export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
         );
       }
     };
-
     // Automated profiling fetch engine: Obtains genuine details input during the account signup cycle
     const fetchGenuineSignupContacts = async () => {
       try {
@@ -212,7 +210,6 @@ export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
           // Maps strings from your specific emergency contact arrays properties
           const firstContact = profileData.emergencyContacts?.[0]?.phone || "";
           const secondContact = profileData.emergencyContacts?.[1]?.phone || "";
-
           setRealContacts({ contact1: firstContact, contact2: secondContact });
 
           // Stores data locally to ensure phone operations persist securely offline
