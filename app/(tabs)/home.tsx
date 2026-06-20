@@ -139,7 +139,6 @@ export default function HomeScreen() {
       <View className="p-4">
         {/* EMERGENCY SOS BUTTON */}
         <EmergencySOS userId={currentUserId} baseUrl={BASE_URL} />
-
         {/* GPS LOCATION FIELD */}
         <View className="bg-[#0f172a] flex-row items-center p-3 rounded-xl mb-4 h-12 border border-white/5">
           <MapPin color="#60a5fa" size={20} />
@@ -197,7 +196,6 @@ export default function HomeScreen() {
             </View>
           ))}
         </View>
-
         {/* ACTIVE HAZARDS NOTIFIER */}
         <View className="bg-[#111c40] rounded-xl p-4 border border-slate-800 -mt-3">
           <View className="flex flex-row justify-between items-center mb-2">
@@ -247,7 +245,6 @@ export default function HomeScreen() {
             )}
           </View>
         </View>
-
         {/* FEATURE CARDS MATRIX CONTAINER */}
         <View className="flex-row flex-wrap justify-between gap-y-2 gap-x-2 mt-4">
           <TrackTeamMap isMiniMap={true} />
