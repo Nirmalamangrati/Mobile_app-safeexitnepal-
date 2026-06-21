@@ -77,7 +77,9 @@ export default function HomeScreen() {
     fetchIncidentCounts();
     const fetchAdminShelters = async () => {
       try {
-        const response = await fetch("http://192.168.43.132:8000/api/shelter");
+        const response = await fetch(
+          "http://192.168.43.132:8000/api/safeshelter",
+        );
 
         if (!response.ok) {
           throw new Error(`Server status: ${response.status}`);
@@ -86,6 +88,7 @@ export default function HomeScreen() {
         setShelterData(data);
       } catch (error) {
         console.error("shelter can not contain from mongoDB:", error);
+        console.error("Full error details:", error);
       }
     };
     fetchAdminShelters();

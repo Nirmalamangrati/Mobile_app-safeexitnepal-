@@ -12,8 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-
-const API_KEY = "895284fb665f4814a4ab1a7e29b6c03d";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface ForecastDay {
   day: string;
@@ -27,18 +26,18 @@ export default function Home() {
   const [weather, setWeather] = useState<any>(null);
   const [forecast, setForecast] = useState<ForecastDay[]>([]);
   const [loading, setLoading] = useState(false);
+  const getBackgroundColors = (): [string, string] => {
+    if (!weather || !weather.weather) return ["#0f172a", "#1e293b"];
 
-  const getBackgroundClass = () => {
-    if (!weather || !weather.weather || weather.weather.length === 0)
-      return "bg-slate-900";
     const mainCondition = weather.weather.main.toLowerCase();
     if (mainCondition.includes("clear") || mainCondition.includes("sunny"))
-      return "bg-sky-600";
+      return ["#0284c7", "#0369a1"];
     if (mainCondition.includes("rain") || mainCondition.includes("drizzle"))
-      return "bg-slate-700";
-    if (mainCondition.includes("cloud")) return "bg-slate-800";
-    if (mainCondition.includes("thunder")) return "bg-zinc-900";
-    return "bg-slate-900";
+      return ["#334155", "#1e293b"];
+    if (mainCondition.includes("cloud")) return ["#1e293b", "#0f172a"];
+    if (mainCondition.includes("thunder")) return ["#18181b", "#09090b"];
+
+    return ["#0f172a", "#1e293b"];
   };
 
   const searchWeather = async () => {
@@ -49,63 +48,49 @@ export default function Home() {
 
     try {
       setLoading(true);
-
-      // १. हालको मौसम: एन्ड्रोइड सेक्युरिटी बाइपास गर्न ऑल-ओरिजिन प्राक्सी प्रयोग गरिएको छ
-      const currentUrl = encodeURIComponent(
-        `https://openweathermap.org{city}&appid=${API_KEY}&units=metric`,
+      const response = await fetch(
+        `http://192.168.43.132:8000/api/weather/${city}`,
       );
-      const currentResponse = await fetch(`https://allorigins.win{currentUrl}`);
-
-      if (!currentResponse.ok) {
-        throw new Error("City not found");
+      if (!response.ok) {
+        throw new Error("City not found or server error");
       }
-      const currentRaw = await currentResponse.json();
-      const currentData = JSON.parse(currentRaw.contents); // प्राक्सीबाट आएको डेटा सुरक्षित रूपमा पार्स गरेको
-      setWeather(currentData);
-
-      // २. ५ दिनको पूर्वानुमान: यहाँ पनि सुरक्षित प्राक्सी टनेल प्रयोग गरिएको छ
-      const forecastUrl = encodeURIComponent(
-        `https://openweathermap.org{city}&appid=${API_KEY}&units=metric`,
-      );
-      const forecastResponse = await fetch(
-        `https://allorigins.win{forecastUrl}`,
-      );
-
-      if (!forecastResponse.ok) {
-        throw new Error("Forecast data failed");
-      }
-      const forecastRaw = await forecastResponse.json();
-      const forecastData = JSON.parse(forecastRaw.contents);
-
+      const data = await response.json();
+      setWeather(data.current);
       const dailySnapshots: ForecastDay[] = [];
       const seenDates = new Set<string>();
 
-      forecastData.list.forEach((item: any) => {
-        const dateStr = item.dt_txt.split(" ");
+      if (data.forecast && data.forecast.list) {
+        data.forecast.list.forEach((item: any) => {
+          const dateStr = item.dt_txt.split(" ")[0];
 
-        if (!seenDates.has(dateStr)) {
-          seenDates.add(dateStr);
+          if (!seenDates.has(dateStr)) {
+            seenDates.add(dateStr);
 
-          const mappedDate = new Date(item.dt * 1000);
-          const dayName = mappedDate.toLocaleDateString("en-US", {
-            weekday: "short",
-          });
-          const todayName = new Date().toLocaleDateString("en-US", {
-            weekday: "short",
-          });
+            const mappedDate = new Date(item.dt * 1000);
+            const dayName = mappedDate.toLocaleDateString("en-US", {
+              weekday: "short",
+            });
+            const todayName = new Date().toLocaleDateString("en-US", {
+              weekday: "short",
+            });
 
-          dailySnapshots.push({
-            day: dayName === todayName ? "Today" : dayName,
-            temp: `${Math.round(item.main.temp_max)}° / ${Math.round(item.main.temp_min)}°`,
-            icon: item.weather.icon,
-            condition: item.weather.main,
-          });
-        }
-      });
+            dailySnapshots.push({
+              day: dayName === todayName ? "Today" : dayName,
+              temp: `${Math.round(item.main.temp_max)}° / ${Math.round(item.main.temp_min)}°`,
+              icon:
+                item.weather && item.weather[0] ? item.weather[0].icon : "01d",
+              condition:
+                item.weather && item.weather[0]
+                  ? item.weather[0].main
+                  : "Clear",
+            });
+          }
+        });
+      }
 
       setForecast(dailySnapshots);
     } catch (error) {
-      console.log("Proxy API Fetch Error: ", error);
+      console.log("Weather Fetch Error Detail: ", error);
       Alert.alert("Error", "City not found or network error");
       setWeather(null);
       setForecast([]);
@@ -122,7 +107,7 @@ export default function Home() {
   }, []);
 
   return (
-    <View className={`flex-1 ${getBackgroundClass()}`}>
+    <LinearGradient colors={getBackgroundColors()} style={{ flex: 1 }}>
       <StatusBar barStyle="light-content" />
       <SafeAreaView className="flex-1" edges={["top", "left", "right"]}>
         <ScrollView
@@ -140,133 +125,126 @@ export default function Home() {
               size={55}
               color="white"
             />
-            <Text className="text-white text-4xl font-extrabold mt-2">
+            <Text className="text-white text-4xl font-extrabold mt-2 tracking-wide">
               Weather App
             </Text>
-            <Text className="text-blue-100">Beautiful Weather Forecast</Text>
+            <Text className="text-blue-100/80 font-medium">
+              Beautiful Weather Forecast
+            </Text>
           </View>
 
           {/* Search Input Bar */}
-          <View className="bg-white/20 rounded-full flex-row items-center px-5 py-3 border border-white/20">
+          <View className="bg-white/20 rounded-full flex-row items-center px-5 py-2.5 border border-white/30 shadow-sm">
             <Ionicons name="location-outline" size={22} color="white" />
             <TextInput
               value={city}
               onChangeText={setCity}
               placeholder="Search city..."
-              placeholderTextColor="#ddd"
+              placeholderTextColor="#e2e8f0"
               className="flex-1 ml-3 text-white text-lg py-1"
               onSubmitEditing={searchWeather}
             />
             <TouchableOpacity onPress={searchWeather}>
-              <Ionicons name="search" size={25} color="white" />
+              <Ionicons name="search" size={22} color="white" />
             </TouchableOpacity>
           </View>
 
           {/* Loading Indicator */}
           {loading && (
-            <ActivityIndicator size="large" color="white" className="mt-12" />
+            <ActivityIndicator size="large" color="#ffffff" className="mt-12" />
           )}
 
           {/* Weather Main Content */}
-          {weather && !loading && weather.weather && weather.weather && (
+          {weather && !loading && weather.weather && (
             <View>
-              <View className="bg-white/15 mt-8 rounded-[35px] p-6 border border-white/20">
+              {/* ग्लास इफेक्ट कार्ड */}
+              <View className="bg-white/10 mt-8 rounded-[30px] p-6 border border-white/20 shadow-lg">
                 <View className="items-center">
-                  <Text className="text-white text-3xl font-bold">
+                  <Text className="text-white text-3xl font-extrabold tracking-wide">
                     {weather.name}
                   </Text>
-                  <Text className="text-blue-100">{weather.sys?.country}</Text>
-
+                  <Text className="text-blue-200 text-sm font-semibold tracking-widest uppercase mt-0.5">
+                    {weather.sys?.country}
+                  </Text>
                   <Image
                     source={{
                       uri: `https://openweathermap.org{weather.weather.icon}@4x.png`,
                     }}
-                    className="w-40 h-40"
+                    className="w-36 h-36 mt-2"
                   />
 
-                  <Text className="text-white text-7xl font-extrabold">
+                  <Text className="text-white text-7xl font-black mt-2">
                     {Math.round(weather.main?.temp)}°
                   </Text>
-                  <Text className="text-blue-100 text-xl capitalize mt-1">
+                  <Text className="text-blue-100 text-lg font-medium capitalize mt-1">
                     {weather.weather.description}
                   </Text>
                 </View>
-
-                {/* ग्रिड विवरण */}
                 <View className="flex-row justify-between mt-8">
-                  <View className="bg-white/10 rounded-2xl p-4 items-center w-[30%]">
-                    <Ionicons name="water" color="#38bdf8" size={28} />
-                    <Text className="text-white mt-2 font-bold">
+                  <View className="bg-white/10 rounded-2xl p-3.5 items-center w-[30%] border border-white/10">
+                    <Ionicons name="water" color="#38bdf8" size={26} />
+                    <Text className="text-white mt-1.5 font-bold text-base">
                       {weather.main?.humidity}%
                     </Text>
-                    <Text className="text-blue-100 text-xs">Humidity</Text>
+                    <Text className="text-blue-200 text-xs">Humidity</Text>
                   </View>
 
-                  <View className="bg-white/10 rounded-2xl p-4 items-center w-[30%]">
-                    <Ionicons name="speedometer" color="#22c55e" size={28} />
-                    <Text className="text-white mt-2 font-bold">
+                  <View className="bg-white/10 rounded-2xl p-3.5 items-center w-[30%] border border-white/10">
+                    <Ionicons name="speedometer" color="#4ade80" size={26} />
+                    <Text className="text-white mt-1.5 font-bold text-base">
                       {Math.round(weather.wind?.speed * 3.6)}
                     </Text>
-                    <Text className="text-blue-100 text-xs">km/h</Text>
+                    <Text className="text-blue-200 text-xs">km/h</Text>
                   </View>
 
-                  <View className="bg-white/10 rounded-2xl p-4 items-center w-[30%]">
+                  <View className="bg-white/10 rounded-2xl p-3.5 items-center w-[30%] border border-white/10">
                     <MaterialCommunityIcons
                       name="thermometer"
                       color="#fb923c"
-                      size={28}
+                      size={26}
                     />
-                    <Text className="text-white mt-2 font-bold">
+                    <Text className="text-white mt-1.5 font-bold text-base">
                       {Math.round(weather.main?.feels_like)}°
                     </Text>
-                    <Text className="text-blue-100 text-xs">Feels</Text>
+                    <Text className="text-blue-200 text-xs">Feels</Text>
                   </View>
                 </View>
               </View>
 
-              {/* ५ दिनको पूर्वानुमान खण्ड */}
-              {forecast.length > 0 && (
-                <View className="bg-white/15 mt-6 rounded-[30px] p-5 border border-white/20">
-                  <Text className="text-white text-lg font-bold mb-4 ml-1">
-                    5-Day Forecast
-                  </Text>
-
-                  {forecast.map((item, index) => (
-                    <View
-                      key={index}
-                      className={`flex-row justify-between items-center py-3 ${
-                        index !== forecast.length - 1
-                          ? "border-b border-white/10"
-                          : ""
-                      }`}
-                    >
-                      <Text className="text-white text-base font-semibold w-20">
-                        {item.day}
-                      </Text>
-
-                      <View className="flex-row items-center flex-1 justify-start ml-2">
-                        <Image
-                          source={{
-                            uri: `https://openweathermap.org{item.icon}.png`,
-                          }}
-                          className="w-10 h-10"
-                        />
-                        <Text className="text-blue-100 text-sm ml-2 capitalize">
-                          {item.condition}
-                        </Text>
-                      </View>
-
-                      <Text className="text-white text-sm font-bold text-right w-24">
-                        {item.temp}
+              {/* 5 Day Forecast List */}
+              <View className="mt-8">
+                <Text className="text-white text-lg font-bold mb-4 ml-1">
+                  5-Day Forecast
+                </Text>
+                {forecast.map((day, index) => (
+                  <View
+                    key={index}
+                    className="bg-white/10 rounded-2xl p-4 flex-row justify-between items-center mb-3 border border-white/10 shadow-sm"
+                  >
+                    <Text className="text-white font-semibold w-16">
+                      {day.day}
+                    </Text>
+                    <View className="flex-row items-center flex-1 justify-center">
+                      <Image
+                        source={{
+                          uri: `https://openweathermap.org{day.icon}.png`,
+                        }}
+                        className="w-10 h-10"
+                      />
+                      <Text className="text-blue-200 text-sm ml-2 capitalize font-medium">
+                        {day.condition}
                       </Text>
                     </View>
-                  ))}
-                </View>
-              )}
+                    <Text className="text-white font-bold text-right w-16">
+                      {day.temp}
+                    </Text>
+                  </View>
+                ))}
+              </View>
             </View>
           )}
         </ScrollView>
       </SafeAreaView>
-    </View>
+    </LinearGradient>
   );
 }
