@@ -1,224 +1,272 @@
 import React, { useState, useEffect } from "react";
 import {
-  Text,
   View,
-  ScrollView,
-  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
   ActivityIndicator,
+  Alert,
+  StatusBar,
+  ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-interface CurrentWeather {
-  temp: number;
-  condition: string;
-  humidity: number;
-  windSpeed: number;
-  iconName: keyof typeof Ionicons.glyphMap;
-}
+const API_KEY = "895284fb665f4814a4ab1a7e29b6c03d";
 
 interface ForecastDay {
   day: string;
   temp: string;
+  icon: string;
   condition: string;
-  iconName: keyof typeof Ionicons.glyphMap;
 }
 
-const getIconName = (conditionId: number): keyof typeof Ionicons.glyphMap => {
-  if (conditionId >= 200 && conditionId < 300) return "thunderstorm";
-  if (conditionId >= 300 && conditionId < 600) return "rainy";
-  if (conditionId >= 600 && conditionId < 700) return "snow";
-  if (conditionId === 800) return "sunny";
-  return "cloudy";
-};
-
-export default function WeatherScreen() {
-  const [currentWeather, setCurrentWeather] = useState<CurrentWeather | null>(
-    null,
-  );
+export default function Home() {
+  const [city, setCity] = useState("Kathmandu");
+  const [weather, setWeather] = useState<any>(null);
   const [forecast, setForecast] = useState<ForecastDay[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Your key is perfectly added here
-  const API_KEY = "5129d2e16d58ee35c833af12c71ce3ee";
-  const CITY = "Kathmandu";
+  const getBackgroundClass = () => {
+    if (!weather || !weather.weather || weather.weather.length === 0)
+      return "bg-slate-900";
+    const mainCondition = weather.weather.main.toLowerCase();
+    if (mainCondition.includes("clear") || mainCondition.includes("sunny"))
+      return "bg-sky-600";
+    if (mainCondition.includes("rain") || mainCondition.includes("drizzle"))
+      return "bg-slate-700";
+    if (mainCondition.includes("cloud")) return "bg-slate-800";
+    if (mainCondition.includes("thunder")) return "bg-zinc-900";
+    return "bg-slate-900";
+  };
 
-  useEffect(() => {
-    const fetchWeatherPayloads = async () => {
-      try {
-        setErrorMsg(null);
+  const searchWeather = async () => {
+    if (!city.trim()) {
+      Alert.alert("Error", "Enter city name");
+      return;
+    }
 
-        const [currentRes, forecastRes] = await Promise.all([
-          fetch(
-            `https://openweathermap.org{CITY}&units=metric&appid=${API_KEY}`,
-          ),
-          fetch(
-            `https://openweathermap.org{CITY}&units=metric&appid=${API_KEY}`,
-          ),
-        ]);
+    try {
+      setLoading(true);
 
-        // DEBUG LOGS: Check your terminal/metro bundler to see these prints!
-        console.log("Current Weather HTTP Status:", currentRes.status);
-        console.log("Forecast HTTP Status:", forecastRes.status);
+      // १. हालको मौसम: एन्ड्रोइड सेक्युरिटी बाइपास गर्न ऑल-ओरिजिन प्राक्सी प्रयोग गरिएको छ
+      const currentUrl = encodeURIComponent(
+        `https://openweathermap.org{city}&appid=${API_KEY}&units=metric`,
+      );
+      const currentResponse = await fetch(`https://allorigins.win{currentUrl}`);
 
-        if (!currentRes.ok) {
-          const errData = await currentRes.json();
-          throw new Error(
-            `Current Weather API Error: ${errData.message || currentRes.statusText}`,
-          );
-        }
-        if (!forecastRes.ok) {
-          const errData = await forecastRes.json();
-          throw new Error(
-            `Forecast API Error: ${errData.message || forecastRes.statusText}`,
-          );
-        }
+      if (!currentResponse.ok) {
+        throw new Error("City not found");
+      }
+      const currentRaw = await currentResponse.json();
+      const currentData = JSON.parse(currentRaw.contents); // प्राक्सीबाट आएको डेटा सुरक्षित रूपमा पार्स गरेको
+      setWeather(currentData);
 
-        const currentData = await currentRes.json();
-        const forecastData = await forecastRes.json();
+      // २. ५ दिनको पूर्वानुमान: यहाँ पनि सुरक्षित प्राक्सी टनेल प्रयोग गरिएको छ
+      const forecastUrl = encodeURIComponent(
+        `https://openweathermap.org{city}&appid=${API_KEY}&units=metric`,
+      );
+      const forecastResponse = await fetch(
+        `https://allorigins.win{forecastUrl}`,
+      );
 
-        setCurrentWeather({
-          temp: Math.round(currentData.main.temp),
-          condition: currentData.weather[0].main, // Fixed array target index bug here
-          humidity: currentData.main.humidity,
-          windSpeed: Math.round(currentData.wind.speed * 3.6),
-          iconName: getIconName(currentData.weather[0].id),
-        });
+      if (!forecastResponse.ok) {
+        throw new Error("Forecast data failed");
+      }
+      const forecastRaw = await forecastResponse.json();
+      const forecastData = JSON.parse(forecastRaw.contents);
 
-        const dailySnapshots: ForecastDay[] = [];
-        const uniqueDayTracker = new Set<string>();
-        const labelToday = new Date().toLocaleDateString("en-US", {
-          weekday: "short",
-        });
+      const dailySnapshots: ForecastDay[] = [];
+      const seenDates = new Set<string>();
 
-        interface ApiForecastItem {
-          dt: number;
-          main: { temp_max: number; temp_min: number };
-          weather: Array<{ id: number; main: string }>;
-        }
+      forecastData.list.forEach((item: any) => {
+        const dateStr = item.dt_txt.split(" ");
 
-        forecastData.list.forEach((item: ApiForecastItem) => {
+        if (!seenDates.has(dateStr)) {
+          seenDates.add(dateStr);
+
           const mappedDate = new Date(item.dt * 1000);
-          const computedDayString = mappedDate.toLocaleDateString("en-US", {
+          const dayName = mappedDate.toLocaleDateString("en-US", {
+            weekday: "short",
+          });
+          const todayName = new Date().toLocaleDateString("en-US", {
             weekday: "short",
           });
 
-          if (
-            computedDayString !== labelToday &&
-            !uniqueDayTracker.has(computedDayString) &&
-            dailySnapshots.length < 3
-          ) {
-            uniqueDayTracker.add(computedDayString);
-            dailySnapshots.push({
-              day: dailySnapshots.length === 0 ? "Tomorrow" : computedDayString,
-              temp: `${Math.round(item.main.temp_max)}° / ${Math.round(item.main.temp_min)}°`,
-              condition: item.weather[0].main,
-              iconName: getIconName(item.weather[0].id),
-            });
-          }
-        });
+          dailySnapshots.push({
+            day: dayName === todayName ? "Today" : dayName,
+            temp: `${Math.round(item.main.temp_max)}° / ${Math.round(item.main.temp_min)}°`,
+            icon: item.weather.icon,
+            condition: item.weather.main,
+          });
+        }
+      });
 
-        setForecast(dailySnapshots);
-      } catch (err: any) {
-        console.error("Full Error Stack:", err);
-        // This will print the exact reason on your phone screen
-        setErrorMsg(err.message || "Could not update weather records.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      setForecast(dailySnapshots);
+    } catch (error) {
+      console.log("Proxy API Fetch Error: ", error);
+      Alert.alert("Error", "City not found or network error");
+      setWeather(null);
+      setForecast([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchWeatherPayloads();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchWeather();
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return (
-      <SafeAreaView className="flex-1 bg-[#0a0f1d] justify-center items-center">
-        <ActivityIndicator size="large" color="#3b82f6" />
-      </SafeAreaView>
-    );
-  }
-
-  if (errorMsg) {
-    return (
-      <SafeAreaView className="flex-1 bg-[#0a0f1d] justify-center items-center p-6">
-        <Ionicons name="alert-circle" size={48} color="#ef4444" />
-        <Text className="text-white text-base mt-4 font-medium text-center">
-          {errorMsg}
-        </Text>
-        <Text className="text-slate-500 text-xs mt-2 text-center">
-          Check your terminal log stream for network diagnostics.
-        </Text>
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-[#0a0f1d]">
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
-        {/* Real-time Status Card */}
-        <View className="bg-[#111827] rounded-2xl p-6 items-center mb-6 border border-[#1f2937]">
-          <Text className="text-xl font-bold text-white mb-4">
-            {CITY}, Nepal
-          </Text>
-          <Ionicons
-            name={currentWeather?.iconName ?? "cloudy"}
-            size={80}
-            color="#3b82f6"
-            className="my-2"
-          />
-          <Text className="text-5xl font-bold text-white">
-            {currentWeather?.temp ?? "--"}°C
-          </Text>
-          <Text className="text-base text-slate-400 mt-2 mb-6">
-            {currentWeather?.condition ?? "Unknown"}
-          </Text>
-
-          <View className="flex-row justify-between w-full border-t border-[#1f2937] pt-5">
-            <View className="items-center flex-1">
-              <Ionicons name="water" size={20} color="#94a3b8" />
-              <Text className="text-xs text-slate-500 mt-1">Humidity</Text>
-              <Text className="text-sm font-semibold text-white mt-0.5">
-                {currentWeather?.humidity ?? "--"}%
-              </Text>
-            </View>
-            <View className="items-center flex-1">
-              <Ionicons name="speedometer" size={20} color="#94a3b8" />
-              <Text className="text-xs text-slate-500 mt-1">Wind Speed</Text>
-              <Text className="text-sm font-semibold text-white mt-0.5">
-                {currentWeather?.windSpeed ?? "--"} km/h
-              </Text>
-            </View>
+    <View className={`flex-1 ${getBackgroundClass()}`}>
+      <StatusBar barStyle="light-content" />
+      <SafeAreaView className="flex-1" edges={["top", "left", "right"]}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingTop: 10,
+            paddingBottom: 40,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View className="items-center mb-8 mt-4">
+            <MaterialCommunityIcons
+              name="weather-partly-cloudy"
+              size={55}
+              color="white"
+            />
+            <Text className="text-white text-4xl font-extrabold mt-2">
+              Weather App
+            </Text>
+            <Text className="text-blue-100">Beautiful Weather Forecast</Text>
           </View>
-        </View>
 
-        {/* 3-Day Forecast */}
-        <View className="bg-[#111827] rounded-2xl p-5 border border-[#1f2937]">
-          <Text className="text-base font-bold text-white mb-4">
-            3-Day Forecast
-          </Text>
+          {/* Search Input Bar */}
+          <View className="bg-white/20 rounded-full flex-row items-center px-5 py-3 border border-white/20">
+            <Ionicons name="location-outline" size={22} color="white" />
+            <TextInput
+              value={city}
+              onChangeText={setCity}
+              placeholder="Search city..."
+              placeholderTextColor="#ddd"
+              className="flex-1 ml-3 text-white text-lg py-1"
+              onSubmitEditing={searchWeather}
+            />
+            <TouchableOpacity onPress={searchWeather}>
+              <Ionicons name="search" size={25} color="white" />
+            </TouchableOpacity>
+          </View>
 
-          {forecast.map((item, index) => (
-            <View
-              key={index}
-              className={`flex-row justify-between items-center py-3 ${
-                index !== forecast.length - 1 ? "border-b border-[#1f2937]" : ""
-              }`}
-            >
-              <Text className="text-sm text-white w-24">{item.day}</Text>
-              <View className="flex-row items-center flex-1 ml-2">
-                <Ionicons name={item.iconName} size={24} color="#3b82f6" />
-                <Text className="text-sm text-slate-400 ml-3">
-                  {item.condition}
-                </Text>
+          {/* Loading Indicator */}
+          {loading && (
+            <ActivityIndicator size="large" color="white" className="mt-12" />
+          )}
+
+          {/* Weather Main Content */}
+          {weather && !loading && weather.weather && weather.weather && (
+            <View>
+              <View className="bg-white/15 mt-8 rounded-[35px] p-6 border border-white/20">
+                <View className="items-center">
+                  <Text className="text-white text-3xl font-bold">
+                    {weather.name}
+                  </Text>
+                  <Text className="text-blue-100">{weather.sys?.country}</Text>
+
+                  <Image
+                    source={{
+                      uri: `https://openweathermap.org{weather.weather.icon}@4x.png`,
+                    }}
+                    className="w-40 h-40"
+                  />
+
+                  <Text className="text-white text-7xl font-extrabold">
+                    {Math.round(weather.main?.temp)}°
+                  </Text>
+                  <Text className="text-blue-100 text-xl capitalize mt-1">
+                    {weather.weather.description}
+                  </Text>
+                </View>
+
+                {/* ग्रिड विवरण */}
+                <View className="flex-row justify-between mt-8">
+                  <View className="bg-white/10 rounded-2xl p-4 items-center w-[30%]">
+                    <Ionicons name="water" color="#38bdf8" size={28} />
+                    <Text className="text-white mt-2 font-bold">
+                      {weather.main?.humidity}%
+                    </Text>
+                    <Text className="text-blue-100 text-xs">Humidity</Text>
+                  </View>
+
+                  <View className="bg-white/10 rounded-2xl p-4 items-center w-[30%]">
+                    <Ionicons name="speedometer" color="#22c55e" size={28} />
+                    <Text className="text-white mt-2 font-bold">
+                      {Math.round(weather.wind?.speed * 3.6)}
+                    </Text>
+                    <Text className="text-blue-100 text-xs">km/h</Text>
+                  </View>
+
+                  <View className="bg-white/10 rounded-2xl p-4 items-center w-[30%]">
+                    <MaterialCommunityIcons
+                      name="thermometer"
+                      color="#fb923c"
+                      size={28}
+                    />
+                    <Text className="text-white mt-2 font-bold">
+                      {Math.round(weather.main?.feels_like)}°
+                    </Text>
+                    <Text className="text-blue-100 text-xs">Feels</Text>
+                  </View>
+                </View>
               </View>
-              <Text className="text-sm text-white font-semibold text-right">
-                {item.temp}
-              </Text>
+
+              {/* ५ दिनको पूर्वानुमान खण्ड */}
+              {forecast.length > 0 && (
+                <View className="bg-white/15 mt-6 rounded-[30px] p-5 border border-white/20">
+                  <Text className="text-white text-lg font-bold mb-4 ml-1">
+                    5-Day Forecast
+                  </Text>
+
+                  {forecast.map((item, index) => (
+                    <View
+                      key={index}
+                      className={`flex-row justify-between items-center py-3 ${
+                        index !== forecast.length - 1
+                          ? "border-b border-white/10"
+                          : ""
+                      }`}
+                    >
+                      <Text className="text-white text-base font-semibold w-20">
+                        {item.day}
+                      </Text>
+
+                      <View className="flex-row items-center flex-1 justify-start ml-2">
+                        <Image
+                          source={{
+                            uri: `https://openweathermap.org{item.icon}.png`,
+                          }}
+                          className="w-10 h-10"
+                        />
+                        <Text className="text-blue-100 text-sm ml-2 capitalize">
+                          {item.condition}
+                        </Text>
+                      </View>
+
+                      <Text className="text-white text-sm font-bold text-right w-24">
+                        {item.temp}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }

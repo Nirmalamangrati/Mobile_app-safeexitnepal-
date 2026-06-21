@@ -11,13 +11,11 @@ import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SMS from "expo-sms";
 import * as Location from "expo-location";
-
 // Interface structure for component props - contact parameters are now handled dynamically internally
 interface EmergencySOSProps {
   userId: string;
   baseUrl: string;
 }
-
 // 1. ADVANCED HAVERSINE ALGORITHM (Great-Circle Distance Calculation)
 const getStrictDistanceKM = (
   lat1: number,
@@ -34,12 +32,10 @@ const getStrictDistanceKM = (
     Math.cos(lat1 * TO_RAD) * Math.cos(lat2 * TO_RAD) * Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
-
 // Global system locks
 let lastExecutionTime = 0;
 let retryDelay = 1000;
 let isSystemLocked = false;
-
 // 2. CORE BACKGROUND LOGIC ENGINE
 export const triggerUltimateSOS = async (config: {
   userId: string;
@@ -58,7 +54,6 @@ export const triggerUltimateSOS = async (config: {
   }
   isSystemLocked = true;
   lastExecutionTime = now;
-
   try {
     const cachedHubsRaw = await AsyncStorage.getItem("cached_security_hubs");
     const NEPAL_SECURITY_HUBS = cachedHubsRaw ? JSON.parse(cachedHubsRaw) : [];
@@ -172,7 +167,6 @@ export const triggerUltimateSOS = async (config: {
     isSystemLocked = false;
   }
 };
-
 // 3. MAIN EXPORTED VISUAL COMPONENT
 export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
   const [sosLoading, setSosLoading] = useState(false);
@@ -228,13 +222,11 @@ export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
         }
       }
     };
-
     if (baseUrl && userId) {
       syncSecurityHubsFromServer();
       fetchGenuineSignupContacts();
     }
   }, [baseUrl, userId]);
-
   const handleSOSPress = async () => {
     Alert.alert(
       "TRIGGER EMERGENCY SOS?",

@@ -102,12 +102,7 @@ const VerifyOtpForm = () => {
       if (response.ok) {
         await AsyncStorage.setItem("userToken", data.token);
         await AsyncStorage.setItem("userData", JSON.stringify(data.user));
-        Alert.alert("Verified", "Login successful!", [
-          {
-            text: "Continue",
-            onPress: () => router.push("/home" as any),
-          },
-        ]);
+        router.push("/home" as any);
       } else {
         Alert.alert("Verification Failed", data.error || "Incorrect OTP code.");
       }
