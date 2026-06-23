@@ -2,7 +2,6 @@ import { Stack } from "expo-router";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
-
 export default function RootLayout() {
   useEffect(() => {
     async function configureSirenChannel() {

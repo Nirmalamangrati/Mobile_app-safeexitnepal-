@@ -137,7 +137,6 @@ export default function HomeScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-
       {/* BODY PANEL */}
       <View className="p-4">
         {/* EMERGENCY SOS BUTTON */}

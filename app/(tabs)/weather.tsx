@@ -105,7 +105,6 @@ export default function Home() {
     }, 500);
     return () => clearTimeout(timer);
   }, []);
-
   return (
     <LinearGradient colors={getBackgroundColors()} style={{ flex: 1 }}>
       <StatusBar barStyle="light-content" />
@@ -157,7 +156,6 @@ export default function Home() {
           {/* Weather Main Content */}
           {weather && !loading && weather.weather && (
             <View>
-              {/* ग्लास इफेक्ट कार्ड */}
               <View className="bg-white/10 mt-8 rounded-[30px] p-6 border border-white/20 shadow-lg">
                 <View className="items-center">
                   <Text className="text-white text-3xl font-extrabold tracking-wide">
@@ -211,10 +209,10 @@ export default function Home() {
                 </View>
               </View>
 
-              {/* 5 Day Forecast List */}
+              {/* 7 Day Forecast List */}
               <View className="mt-8">
                 <Text className="text-white text-lg font-bold mb-4 ml-1">
-                  5-Day Forecast
+                  7-Day Forecast
                 </Text>
                 {forecast.map((day, index) => (
                   <View
