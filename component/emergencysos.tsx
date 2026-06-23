@@ -254,7 +254,6 @@ export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
       ],
     );
   };
-
   return (
     <View className="items-center mb-4 w-full">
       <TouchableOpacity

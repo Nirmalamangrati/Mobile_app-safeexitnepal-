@@ -160,7 +160,6 @@ export const OfflineResources: React.FC = () => {
   const filteredResources = resources.filter(
     (res) => res.resourceType === selectedCategory,
   );
-
   return (
     <ScrollView className="bg-[#0f172a] flex-1 p-5 p-4 rounded-2xl w-full border border-slate-800">
       <Text className="text-2xl font-bold text-white mt-5">
@@ -178,7 +177,6 @@ export const OfflineResources: React.FC = () => {
             Download maps
           </Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           className="w-[47%] bg-[#0f172a] p-5 rounded-2xl items-center mb-4"
           onPress={() => setSelectedCategory("Tool")}
