@@ -36,6 +36,8 @@ interface IncidentCounts {
 
 export default function HomeScreen() {
   const [aiHazards, setAiHazards] = useState<any[]>([]);
+  const [rescueTeams, setRescueTeams] = useState<any[]>([]);
+  const [loadingAi, setLoadingAi] = useState<boolean>(false);
   const [language, setLanguage] = useState("en");
   const [showReportForm, setShowReportForm] = useState(false);
   const [counts, setCounts] = useState<IncidentCounts>({
@@ -49,6 +51,33 @@ export default function HomeScreen() {
   const [shelterData, setShelterData] = useState([]);
   const BASE_URL = "http://192.168.43.132:8000";
   const currentUserId = "6644bc231f23ab0017f8a91c";
+  const currentCity = "Kathmandu";
+  // २. ब्याकइन्डबाट एआई क्लस्टरिङ र मौसम अलर्टको डेटा तान्ने फङ्सन
+  const fetchAiDisasterData = async () => {
+    try {
+      setLoadingAi(true);
+      const response = await fetch(
+        `${BASE_URL}/api/aiclustering/${currentCity}`,
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        // ब्याकइन्डको जेसन रेस्पोन्सलाई फ्रन्टइन्ड स्टेटहरूमा सेट गर्ने
+        setAiHazards(data.aiHazards || []);
+        setRescueTeams(data.smartRescueDispatch || []);
+        setShelterData(data.optimizedRoutesAndShelters || []);
+      }
+    } catch (error) {
+      console.error("Home Tab AI Fetch Error:", error);
+    } finally {
+      setLoadingAi(false);
+    }
+  };
+
+  // ३. स्क्रिन लोड हुने बित्तिकै स्वतः एआई डेटा रन गराउने
+  useEffect(() => {
+    fetchAiDisasterData();
+  }, [currentCity]);
   // 1. Fetch Dynamic Incident Counts from Backend
   const fetchIncidentCounts = async () => {
     try {
@@ -198,6 +227,7 @@ export default function HomeScreen() {
             </View>
           ))}
         </View>
+
         {/* ACTIVE HAZARDS NOTIFIER */}
         <View className="bg-[#111c40] rounded-xl p-4 border border-slate-800 -mt-3">
           <View className="flex flex-row justify-between items-center mb-2">
@@ -215,19 +245,21 @@ export default function HomeScreen() {
           </View>
           {/* AI cluster list*/}
           <View className="space-y-2 mt-3">
-            {aiHazards.length === 0 ? (
+            {loadingAi ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : aiHazards.length === 0 ? (
               <Text className="text-xs text-slate-500 italic">
                 No high-density crisis clusters detected yet.
               </Text>
             ) : (
               aiHazards.map((hazard, index) => (
                 <View
-                  key={index}
+                  key={hazard.clusterId || index}
                   className="bg-red-950/20 border border-red-900/30 p-3 rounded-lg flex flex-col gap-1"
                 >
                   <View className="flex flex-row justify-between items-center">
                     <Text className="text-xs text-red-400 font-bold">
-                      Crisis Hotspot #{hazard.clusterId + 1}
+                      Crisis Hotspot #{index + 1}
                     </Text>
                     <View className="bg-red-600 px-1.5 py-0.5 rounded">
                       <Text className="text-white text-[10px] font-black">
@@ -239,17 +271,19 @@ export default function HomeScreen() {
                     {hazard.message}
                   </Text>
                   <Text className="text-[10px] text-slate-500">
-                    Loc: {hazard.latitude.toFixed(4)},{" "}
-                    {hazard.longitude.toFixed(4)}
+                    Loc:{" "}
+                    {hazard.latitude ? hazard.latitude.toFixed(4) : "0.0000"},{" "}
+                    {hazard.longitude ? hazard.longitude.toFixed(4) : "0.0000"}
                   </Text>
                 </View>
               ))
             )}
           </View>
         </View>
+
         {/* FEATURE CARDS MATRIX CONTAINER */}
         <View className="flex-row flex-wrap justify-between gap-y-2 gap-x-2 mt-4">
-          <TrackTeamMap isMiniMap={true} />
+          <TrackTeamMap isMiniMap={true} rescueTeams={rescueTeams} />
           <FindShelters shelters={shelterData} />
           <OfflineResources />
         </View>

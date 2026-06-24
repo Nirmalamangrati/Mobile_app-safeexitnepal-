@@ -86,8 +86,31 @@ export default function Home() {
             });
           }
         });
-      }
+        const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const todayName = new Date().toLocaleDateString("en-US", {
+          weekday: "short",
+        });
 
+        while (dailySnapshots.length > 0 && dailySnapshots.length < 7) {
+          const lastItem = dailySnapshots[dailySnapshots.length - 1];
+          let lastDayName = lastItem.day;
+
+          if (lastDayName === "Today") {
+            lastDayName = todayName;
+          }
+
+          const lastIndex = weekdays.indexOf(lastDayName);
+          const nextDayIndex = (lastIndex + 1) % 7;
+          const nextDayName = weekdays[nextDayIndex];
+
+          dailySnapshots.push({
+            day: nextDayName,
+            temp: lastItem.temp,
+            icon: lastItem.icon,
+            condition: lastItem.condition,
+          });
+        }
+      }
       setForecast(dailySnapshots);
     } catch (error) {
       console.log("Weather Fetch Error Detail: ", error);

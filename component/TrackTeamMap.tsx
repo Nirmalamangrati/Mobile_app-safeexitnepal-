@@ -25,11 +25,13 @@ export default function TrackTeamMap({
   navigation,
   isMiniMap = true,
   item,
+  rescueTeams = [],
 }: {
   route?: any;
   navigation?: any;
   isMiniMap?: boolean;
   item?: any;
+  rescueTeams?: any[];
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const initialTeam = useMemo(
@@ -56,6 +58,20 @@ export default function TrackTeamMap({
   const [distance, setDistance] = useState<string>(
     dynamicTeam.distanceFromMe || dynamicTeam.roadDistance || "Calculating...",
   );
+
+  useEffect(() => {
+    if (rescueTeams && rescueTeams.length > 0) {
+      const activeAiTeam = rescueTeams[0];
+      setDynamicTeam(activeAiTeam);
+      if (activeAiTeam.latitude && activeAiTeam.longitude) {
+        setTeamLoc({
+          latitude: activeAiTeam.latitude,
+          longitude: activeAiTeam.longitude,
+        });
+      }
+    }
+  }, [rescueTeams]);
+
   useEffect(() => {
     const fetchLatestTeam = async () => {
       try {
