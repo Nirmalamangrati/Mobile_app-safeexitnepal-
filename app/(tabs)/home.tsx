@@ -293,7 +293,6 @@ export default function HomeScreen() {
           onPress={() => setShowReportForm(true)}
           className="bg-blue-600 p-4 rounded-xl flex-row justify-center items-center mt-4 mb-8"
         >
-          <Ionicons name="document-text" size={20} color="white" />
           <Text className="text-white font-bold text-lg ml-2">
             Report New Incident
           </Text>

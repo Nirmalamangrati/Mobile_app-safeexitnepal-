@@ -112,7 +112,6 @@ export default function IncidentsTab(): React.JSX.Element {
 
     return (
       <View className="mt-3 p-3 bg-slate-900 rounded-xl border border-slate-700/50 flex-row items-center">
-        <Text className="text-xl mr-2">📄</Text>
         <Text
           className="text-xs font-semibold text-blue-400 flex-1"
           numberOfLines={1}
