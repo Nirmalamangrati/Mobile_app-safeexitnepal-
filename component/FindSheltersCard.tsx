@@ -1,4 +1,4 @@
-import { MapPin, Clock3, Navigation,  } from "lucide-react-native";
+import { MapPin, Clock3, Navigation } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   View,
@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { router } from "expo-router";
-
 // Prop maa real shelters data receive garne banako
 export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
   const [locationName, setLocationName] = useState<string>(
