@@ -176,9 +176,7 @@ export default function ReportIncident(): React.JSX.Element {
           "Content-Type": "multipart/form-data",
         },
       });
-
       const result = await response.json();
-
       if (response.ok) {
         Alert.alert(
           "Success",
