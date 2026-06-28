@@ -182,7 +182,6 @@ export default function ReportIncident(): React.JSX.Element {
           "Success",
           "Incident Report Sent to Server! Admin will review it shortly.",
         );
-
         // Clear subfields states parameters configuration loop:
         setIncidentCategory("");
         setIncidentType("");
