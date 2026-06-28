@@ -7,11 +7,9 @@ import { ArrowLeft, MapPin } from "lucide-react-native";
 export default function MapScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-
   const shelterName = params.name ? String(params.name) : "Safe Shelter";
   const shelterLat = params.lat ? Number(params.lat) : 27.6564;
   const shelterLng = params.lng ? Number(params.lng) : 85.342;
-
   return (
     <View className="flex-1 bg-[#0f172a] relative">
       {/* Fixed Full Screen Map View Component wrapper */}
