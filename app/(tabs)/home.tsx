@@ -8,6 +8,7 @@ import {
   Modal,
   Alert,
   ActivityIndicator,
+  SafeAreaView,
 } from "react-native";
 import * as Location from "expo-location";
 import {
@@ -18,13 +19,15 @@ import {
   Zap,
   ShieldCheck,
 } from "lucide-react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
 import ReportIncident from "@/component/ReportIncident";
 import TrackTeamMap from "@/component/TrackTeamMap";
 import { FindShelters } from "@/component/FindSheltersCard";
 import { io } from "socket.io-client";
 import { OfflineResources } from "@/component/OfflineResourcesCard";
 import EmergencySOS from "@/component/emergencysos";
+import SettingsModal from "@/component/Setting";
+
 const socket = io("http://192.168.43.132:8000");
 // Type definition for counts mapping
 interface IncidentCounts {
@@ -38,7 +41,7 @@ export default function HomeScreen() {
   const [aiHazards, setAiHazards] = useState<any[]>([]);
   const [rescueTeams, setRescueTeams] = useState<any[]>([]);
   const [loadingAi, setLoadingAi] = useState<boolean>(false);
-  const [language, setLanguage] = useState("en");
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [showReportForm, setShowReportForm] = useState(false);
   const [counts, setCounts] = useState<IncidentCounts>({
     critical: 0,
@@ -52,7 +55,7 @@ export default function HomeScreen() {
   const BASE_URL = "http://192.168.43.132:8000";
   const currentUserId = "6644bc231f23ab0017f8a91c";
   const currentCity = "Kathmandu";
-  // २. ब्याकइन्डबाट एआई क्लस्टरिङ र मौसम अलर्टको डेटा तान्ने फङ्सन
+  // 2. backend bata AI clustering and weather alert data tanne function
   const fetchAiDisasterData = async () => {
     try {
       setLoadingAi(true);
@@ -60,9 +63,7 @@ export default function HomeScreen() {
         `${BASE_URL}/api/aiclustering/${currentCity}`,
       );
       const data = await response.json();
-
       if (data.success) {
-        // ब्याकइन्डको जेसन रेस्पोन्सलाई फ्रन्टइन्ड स्टेटहरूमा सेट गर्ने
         setAiHazards(data.aiHazards || []);
         setRescueTeams(data.smartRescueDispatch || []);
         setShelterData(data.optimizedRoutesAndShelters || []);
@@ -73,8 +74,6 @@ export default function HomeScreen() {
       setLoadingAi(false);
     }
   };
-
-  // ३. स्क्रिन लोड हुने बित्तिकै स्वतः एआई डेटा रन गराउने
   useEffect(() => {
     fetchAiDisasterData();
   }, [currentCity]);
@@ -150,22 +149,32 @@ export default function HomeScreen() {
     <ScrollView className="flex-1 bg-[#020617]">
       {/* HEADER */}
       <View className="bg-[#0f172a] px-4 pt-[50px] pb-5 border-b border-[#1e293b] flex-row justify-between items-center">
-        <View className="flex-row items-center">
-          <View className="w-9 h-9 rounded-full bg-blue-500 items-center justify-center mr-2">
-            <Shield color="white" size={18} />
+        <SafeAreaView className="flex-1 bg-[#0B1528]">
+          <View className="flex-row items-center justify-between px-4 py-3">
+            <View className="flex-row items-center gap-2">
+              <View className="w-8 h-8 rounded-full bg-blue-500 items-center justify-center">
+                <Feather name="shield" size={18} color="white" />
+              </View>
+              <Text className="text-white font-bold text-lg">
+                SafeExit Nepal
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              className="p-2"
+              activeOpacity={0.7}
+            >
+              <Feather name="menu" size={28} color="white" />
+            </TouchableOpacity>
           </View>
-          <Text className="text-white text-xl font-bold">SafeExit Nepal</Text>
-        </View>
-
-        <TouchableOpacity
-          onPress={() => setLanguage(language === "en" ? "ne" : "en")}
-          className="bg-[#1e293b] px-3 py-1.5 rounded-lg"
-        >
-          <Text className="text-white">
-            {language === "en" ? "नेपाली" : "English"}
-          </Text>
-        </TouchableOpacity>
+          <SettingsModal
+            animationType="slide"
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+          />
+        </SafeAreaView>
       </View>
+
       {/* BODY PANEL */}
       <View className="p-4">
         {/* EMERGENCY SOS BUTTON */}

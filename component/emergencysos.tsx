@@ -259,7 +259,7 @@ export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
       <TouchableOpacity
         onPress={handleSOSPress}
         disabled={sosLoading}
-        className="bg-red-600 px-8 py-5 rounded-full flex-row items-center active:opacity-80 w-full justify-center"
+        className="bg-red-600 px-8 py-6 rounded-full flex-row items-center active:opacity-80 w-full justify-center"
         style={{ opacity: sosLoading ? 0.6 : 1 }}
       >
         {sosLoading ? (
