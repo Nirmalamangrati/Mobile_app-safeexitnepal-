@@ -233,7 +233,6 @@ export const OfflineResources: React.FC = () => {
           <Text className="text-white text-base font-bold mb-3">
             Available Files ({selectedCategory}):
           </Text>
-
           {filteredResources.length === 0 ? (
             <Text className="text-gray-400 italic">
               No files available in this category.
