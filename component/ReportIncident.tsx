@@ -391,7 +391,7 @@ export default function ReportIncident(): React.JSX.Element {
       <View className="p-4 bg-slate-800 rounded-xl mb-4 w-full">
         <View className="mb-3">
           <Text className="text-white text-base font-bold">
-            📁 5. Attached Files (Optional)
+            Attached Files (Optional)
           </Text>
         </View>
 
