@@ -12,7 +12,6 @@ export default function MapScreen() {
   const shelterLng = params.lng ? Number(params.lng) : 85.342;
   return (
     <View className="flex-1 bg-[#0f172a] relative">
-      {/* Fixed Full Screen Map View Component wrapper */}
       <View style={styles.mapContainer}>
         <MapView
           style={styles.mapStyle}

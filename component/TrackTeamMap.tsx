@@ -227,7 +227,7 @@ export default function TrackTeamMap({
         </View>
         {/* Dynamic Detail List */}
         <View className="space-y-2.5 mb-4">
-          {/* १. Team Name */}
+          {/* 1. Team Name */}
           <View className="flex-row items-center justify-between bg-slate-800/40 p-2.5 rounded-xl ">
             <View className="flex-row items-center">
               <Users size={14} color="#3b82f6" />
@@ -240,7 +240,7 @@ export default function TrackTeamMap({
               {dynamicTeam.name || "Assigning Team..."}
             </Text>
           </View>
-          {/* २. Status */}
+          {/* 2. Status */}
           <View className="flex-row items-center justify-between bg-slate-800/40 p-2.5 rounded-xl ">
             <View className="flex-row items-center">
               <Shield size={14} color="#60a5fa" />
