@@ -394,7 +394,6 @@ export default function ReportIncident(): React.JSX.Element {
             Attached Files (Optional)
           </Text>
         </View>
-
         {/* ONPRESS HANDLER TRIGGER STRICKLY BINDED OUTSIDE NESTED OVERRIDES FOR SAFE HARDWARE CONTROL CLICK EVENT */}
         <TouchableOpacity
           activeOpacity={0.7}
