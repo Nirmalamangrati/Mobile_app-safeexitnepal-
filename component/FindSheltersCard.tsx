@@ -46,9 +46,7 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
       const shelterLng = Number(
         shelter.longitude || shelter.lng || shelter.location?.coordinates?.[0],
       );
-
       if (isNaN(shelterLat) || isNaN(shelterLng)) return;
-
       const R = 6371; // earth radius (KM)
       const dLat = (shelterLat - userLat) * (Math.PI / 180);
       const dLon = (shelterLng - userLng) * (Math.PI / 180);
