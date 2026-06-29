@@ -17,7 +17,6 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
   );
   const [nearestShelter, setNearestShelter] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   // 1. real 'shelters' data use garera KNN Search garne algorithm
   function calculateNearestShelter(
     userLat: number,
