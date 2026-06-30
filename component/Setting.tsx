@@ -5,10 +5,9 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
-  Switch, // अफलाइन मोड टगल गर्न स्विच थपियो
+  Switch, 
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5"; // यदि CLI हो भने 'react-native-vector-icons/FontAwesome5' राख्नुहोस्
 import { useTranslation } from "react-i18next";
 import "./i18n";
 
@@ -30,15 +29,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const selectedLang = i18n.language;
   const [oldPassword, setOldPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
-
-  // अफलाइन मोडको स्टेट (State)
   const [isOfflineMode, setIsOfflineMode] = useState<boolean>(false);
-
   const handleClose = () => {
     setCurrentView("menu");
     onClose();
   };
-
   const changeLanguage = (lang: "en" | "ne") => {
     i18n.changeLanguage(lang);
   };
