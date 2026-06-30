@@ -5,7 +5,7 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
-  Switch, 
+  Switch,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "react-i18next";
@@ -216,5 +216,4 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     </Modal>
   );
 };
-
 export default SettingsModal;
