@@ -16,7 +16,7 @@ interface EmergencySOSProps {
   userId: string;
   baseUrl: string;
 }
-// 1. ADVANCED HAVERSINE ALGORITHM (Great-Circle Distance Calculation)
+//  ADVANCED HAVERSINE ALGORITHM (Great-Circle Distance Calculation)
 const getStrictDistanceKM = (
   lat1: number,
   lon1: number,
@@ -36,7 +36,7 @@ const getStrictDistanceKM = (
 let lastExecutionTime = 0;
 let retryDelay = 1000;
 let isSystemLocked = false;
-// 2. CORE BACKGROUND LOGIC ENGINE
+// CORE BACKGROUND LOGIC ENGINE
 export const triggerUltimateSOS = async (config: {
   userId: string;
   contact1: string;
@@ -167,7 +167,7 @@ export const triggerUltimateSOS = async (config: {
     isSystemLocked = false;
   }
 };
-// 3. MAIN EXPORTED VISUAL COMPONENT
+//  MAIN EXPORTED VISUAL COMPONENT
 export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
   const [sosLoading, setSosLoading] = useState(false);
   // Local state references for true setup variables fetched from your user document fields

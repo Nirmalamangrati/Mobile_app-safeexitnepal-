@@ -231,7 +231,7 @@ export default function ReportIncident(): React.JSX.Element {
       {/* CONFIDENTIALITY NOTICE */}
       <View style={styles.infoBox}>
         <Text style={styles.infoText}>
-          ℹ️ Your information is confidential and used solely for safety
+          Your information is confidential and used solely for safety
           improvements.
         </Text>
       </View>
@@ -246,7 +246,7 @@ export default function ReportIncident(): React.JSX.Element {
       {/* SECTION 1: Incident Details */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}> 1. Incident Details</Text>
+          <Text style={styles.sectionTitle}> Incident Details</Text>
         </View>
         <Text style={styles.label}>Incident Category *</Text>
         <View style={styles.pickerContainer}>
@@ -310,7 +310,7 @@ export default function ReportIncident(): React.JSX.Element {
       {/* SECTION 2: Suspect Details */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>👤 2. Suspect Information</Text>
+          <Text style={styles.sectionTitle}>Suspect Information</Text>
         </View>
         <Text style={styles.label}>Name (Optional)</Text>
         <TextInput
@@ -358,7 +358,7 @@ export default function ReportIncident(): React.JSX.Element {
       {/* SECTION 3: Reporter Details */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>👤 3. Reporter Information</Text>
+          <Text style={styles.sectionTitle}> Reporter Information</Text>
         </View>
 
         <Text style={styles.label}>Your Name *</Text>
@@ -425,7 +425,7 @@ export default function ReportIncident(): React.JSX.Element {
       {/* SECTION 6: Declaration Box */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>🛡️ 6. Declaration</Text>
+          <Text style={styles.sectionTitle}> Declaration</Text>
         </View>
         <View style={styles.toggleRow}>
           <Text style={styles.declarationText}>
