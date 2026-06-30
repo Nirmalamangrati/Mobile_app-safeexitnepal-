@@ -172,7 +172,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </TouchableOpacity>
           </View>
         )}
-
         {/* password change view*/}
         {currentView === "pass" && (
           <View className="w-full">
