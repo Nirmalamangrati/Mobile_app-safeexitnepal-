@@ -28,7 +28,7 @@ import { OfflineResources } from "@/component/OfflineResourcesCard";
 import EmergencySOS from "@/component/emergencysos";
 import SettingsModal from "@/component/Setting";
 
-const socket = io("http://192.168.43.132:8000");
+const socket = io("https://safeexitnepal-backend-2.onrender.com");
 // Type definition for counts mapping
 interface IncidentCounts {
   critical: number;
@@ -52,7 +52,7 @@ export default function HomeScreen() {
 
   const [countsLoading, setCountsLoading] = useState<boolean>(true);
   const [shelterData, setShelterData] = useState([]);
-  const BASE_URL = "http://192.168.43.132:8000";
+  const BASE_URL = "https://safeexitnepal-backend-2.onrender.com";
   const currentUserId = "6644bc231f23ab0017f8a91c";
   const currentCity = "Kathmandu";
   // 2. backend bata AI clustering and weather alert data tanne function
@@ -106,7 +106,7 @@ export default function HomeScreen() {
     const fetchAdminShelters = async () => {
       try {
         const response = await fetch(
-          "http://192.168.43.132:8000/api/safeshelter",
+          "https://safeexitnepal-backend-2.onrender.com/api/safeshelter",
         );
 
         if (!response.ok) {

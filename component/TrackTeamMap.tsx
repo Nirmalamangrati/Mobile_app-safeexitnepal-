@@ -10,8 +10,8 @@ import {
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { io } from "socket.io-client";
 import { Users, Shield, Phone, MapPin } from "lucide-react-native";
-const BASE_URL = "http://192.168.43.132:8000";
-const socket = io("http://192.168.43.132:8000");
+const BASE_URL = "https://safeexitnepal-backend-2.onrender.com";
+const socket = io("https://safeexitnepal-backend-2.onrender.com");
 
 interface AdminDataField {
   _id: string;
@@ -153,7 +153,9 @@ export default function TrackTeamMap({
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const response = await fetch("http://192.168.43.132:8000/api/teams");
+        const response = await fetch(
+          "https://safeexitnepal-backend-2.onrender.com/api/teams",
+        );
         const data = await response.json();
         setAdminData(data); // Real data state maa set garyo
       } catch (error) {

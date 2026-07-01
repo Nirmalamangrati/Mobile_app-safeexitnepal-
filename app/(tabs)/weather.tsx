@@ -49,7 +49,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://192.168.43.132:8000/api/weather/${city}`,
+        `https://safeexitnepal-backend-2.onrender.com/api/weather/${city}`,
       );
       if (!response.ok) {
         throw new Error("City not found or server error");

@@ -14,7 +14,7 @@ import {
 export default function IncidentsTab(): React.JSX.Element {
   const [incidents, setIncidents] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const BASE_URL = "http://192.168.43.132:8000";
+  const BASE_URL = "https://safeexitnepal-backend-2.onrender.com";
 
   useEffect(() => {
     const fetchApprovedIncidents = async () => {

@@ -32,7 +32,7 @@ interface OfflineResource {
   fileUrl: string;
 }
 
-const BACKEND_URL = "http://192.168.43.132:8000";
+const BACKEND_URL = "https://safeexitnepal-backend-2.onrender.com";
 
 export const OfflineResources: React.FC = () => {
   const [resources, setResources] = useState<OfflineResource[]>([]);

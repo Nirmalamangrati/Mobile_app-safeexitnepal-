@@ -152,7 +152,7 @@ export default function EditProfileScreen() {
       };
 
       const response = await fetch(
-        `http://192.168.43.132:8000/api/profile/update/${userId}`,
+        `https://safeexitnepal-backend-2.onrender.com/api/profile/update/${userId}`,
         {
           method: "PUT",
           headers: {

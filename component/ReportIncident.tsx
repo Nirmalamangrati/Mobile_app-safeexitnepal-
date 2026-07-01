@@ -169,13 +169,16 @@ export default function ReportIncident(): React.JSX.Element {
     }
     try {
       console.log("➔ [FRONTEND DISPATCH] Submitting Form with File data...");
-      const response = await fetch("http://192.168.43.132:8000/api/incidents", {
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
+      const response = await fetch(
+        "https://safeexitnepal-backend-2.onrender.com/api/incidents",
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         },
-      });
+      );
       const result = await response.json();
       if (response.ok) {
         Alert.alert(

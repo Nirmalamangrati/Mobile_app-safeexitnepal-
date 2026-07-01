@@ -24,7 +24,7 @@ import {
   ArrowLeft,
 } from "lucide-react-native";
 
-const BASE_URL = "http://192.168.43.132:8000";
+const BASE_URL = "https://safeexitnepal-backend-2.onrender.com";
 
 type PermissionKey =
   | "location"
