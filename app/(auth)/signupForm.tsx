@@ -181,7 +181,6 @@ const SafeExitSignup = () => {
         "Please agree to the Terms & Conditions.",
       );
     }
-
     try {
       const response = await fetch(`${BASE_URL}/api/auth/signup`, {
         method: "POST",
@@ -190,9 +189,7 @@ const SafeExitSignup = () => {
         },
         body: JSON.stringify(formData),
       });
-
       const data = await response.json();
-
       if (response.ok) {
         setIsModalVisible(false);
 
