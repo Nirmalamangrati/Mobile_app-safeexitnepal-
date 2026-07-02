@@ -72,7 +72,6 @@ const SafeExitSignup = () => {
 
     agreed: false,
   });
-
   // Toggle Permission
   const togglePermission = (key: PermissionKey) => {
     setFormData((prev) => ({
@@ -108,19 +107,16 @@ const SafeExitSignup = () => {
         "Please enter name, phone number and relationship.",
       );
     }
-
     const newContact = {
       name: newContactName.trim(),
       relationship: newContactRelationship.trim(),
       phone: newContactPhone.trim(),
       primary: formData.emergencyContacts.length === 0,
     };
-
     setFormData((prev) => ({
       ...prev,
       emergencyContacts: [...prev.emergencyContacts, newContact],
     }));
-
     setNewContactName("");
     setNewContactPhone("");
     setNewContactRelationship("");
