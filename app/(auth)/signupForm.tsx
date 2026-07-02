@@ -9,9 +9,7 @@ import {
   Modal,
   Switch,
 } from "react-native";
-
 import { useRouter } from "expo-router";
-
 import {
   User,
   Mail,
