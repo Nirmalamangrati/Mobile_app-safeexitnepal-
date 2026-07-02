@@ -21,22 +21,17 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react-native";
-
 const BASE_URL = "https://safeexitnepal-backend-2.onrender.com";
-
 type PermissionKey =
   | "location"
   | "notifications"
   | "sms"
   | "phone"
   | "background";
-
 const SafeExitSignup = () => {
   const router = useRouter();
-
   const [step, setStep] = useState(1);
   const [isModalVisible, setIsModalVisible] = useState(true);
-
   // Emergency Contact Input
   const [newContactName, setNewContactName] = useState("");
   const [newContactPhone, setNewContactPhone] = useState("");
