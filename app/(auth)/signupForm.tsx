@@ -127,7 +127,6 @@ const SafeExitSignup = () => {
     const filtered = formData.emergencyContacts.filter(
       (_, idx) => idx !== index,
     );
-
     setFormData((prev) => ({
       ...prev,
       emergencyContacts: filtered,
