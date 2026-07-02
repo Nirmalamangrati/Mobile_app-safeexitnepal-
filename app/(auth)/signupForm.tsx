@@ -148,7 +148,6 @@ const SafeExitSignup = () => {
           "Please fill all required fields.",
         );
       }
-
       if (formData.password !== formData.confirmPassword) {
         return Alert.alert(
           "Password Error",
@@ -166,7 +165,6 @@ const SafeExitSignup = () => {
         );
       }
     }
-
     setStep((prev) => prev + 1);
   };
 
