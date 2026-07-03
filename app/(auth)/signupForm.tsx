@@ -181,10 +181,6 @@ const SafeExitSignup = () => {
         "Please agree to the Terms & Conditions.",
       );
     }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000);
-
     try {
       const response = await fetch(`${BASE_URL}/api/auth/signup`, {
         method: "POST",
@@ -192,11 +188,7 @@ const SafeExitSignup = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-        signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
-
       const data = await response.json();
       if (response.ok) {
         setIsModalVisible(false);
@@ -210,17 +202,8 @@ const SafeExitSignup = () => {
       } else {
         Alert.alert("Signup Failed", data.error || "Something went wrong.");
       }
-    } catch (error: any) {
-      clearTimeout(timeoutId);
-
-      if (error.name === "AbortError") {
-        Alert.alert(
-          "Server Wakeup Time",
-          "The server is taking a moment to boot up. Please wait 10 seconds and try clicking 'Verify & Proceed' again.",
-        );
-      } else {
-        Alert.alert("Connection Error", "Unable to connect to the server.");
-      }
+    } catch (error) {
+      Alert.alert("Connection Error", "Unable to connect to the server.");
     }
   };
 
