@@ -246,7 +246,6 @@ const SafeExitSignup = () => {
                     {i}
                   </Text>
                 </View>
-
                 {i < 5 && (
                   <View
                     className={`flex-1 h-[2px] mx-2 ${
