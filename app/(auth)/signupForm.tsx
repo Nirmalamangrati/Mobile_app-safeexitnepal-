@@ -263,7 +263,6 @@ const SafeExitSignup = () => {
                 <Text className="text-2xl font-bold text-center text-gray-900">
                   Create Account
                 </Text>
-
                 <Text className="text-center text-gray-400 text-xs mt-1 mb-7">
                   Enter your personal information.
                 </Text>
