@@ -256,7 +256,6 @@ const SafeExitSignup = () => {
               </View>
             ))}
           </View>
-
           <View className="px-6">
             {/* STEP 1 */}
             {step === 1 && (
