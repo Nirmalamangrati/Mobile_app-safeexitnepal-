@@ -304,7 +304,6 @@ const SafeExitSignup = () => {
                     className="flex-1 ml-2 text-sm text-gray-800"
                   />
                 </View>
-
                 {/* EMAIL */}
                 <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 mb-3">
                   <Mail size={18} color="#94a3b8" />
