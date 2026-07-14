@@ -308,7 +308,6 @@ const SafeExitSignup = () => {
                 {/* EMAIL */}
                 <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 mb-3">
                   <Mail size={18} color="#94a3b8" />
-
                   <TextInput
                     placeholder="Email Address"
                     keyboardType="email-address"
