@@ -45,7 +45,6 @@ export const triggerUltimateSOS = async (config: {
 }) => {
   const { userId, contact1, contact2, baseUrl } = config;
   const now = Date.now();
-
   if (isSystemLocked || now - lastExecutionTime < 1500) {
     console.warn(
       "[CRITICAL ALERT] Rate Limit Triggered: Panic clicking ignored.",
