@@ -199,7 +199,6 @@ export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
         const response = await fetch(`${baseUrl}/api/user/profile/${userId}`);
         if (response.ok) {
           const profileData = await response.json();
-
           // Maps strings from your specific emergency contact arrays properties
           const firstContact = profileData.emergencyContacts?.[0]?.phone || "";
           const secondContact = profileData.emergencyContacts?.[1]?.phone || "";
