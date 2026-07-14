@@ -203,7 +203,6 @@ export default function EmergencySOS({ userId, baseUrl }: EmergencySOSProps) {
           const firstContact = profileData.emergencyContacts?.[0]?.phone || "";
           const secondContact = profileData.emergencyContacts?.[1]?.phone || "";
           setRealContacts({ contact1: firstContact, contact2: secondContact });
-
           // Stores data locally to ensure phone operations persist securely offline
           await AsyncStorage.setItem(
             `offline_contacts_${userId}`,
