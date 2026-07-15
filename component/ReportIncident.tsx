@@ -360,7 +360,6 @@ export default function ReportIncident(): React.JSX.Element {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}> Reporter Information</Text>
         </View>
-
         <Text style={styles.label}>Your Name *</Text>
         <TextInput
           style={styles.input}
