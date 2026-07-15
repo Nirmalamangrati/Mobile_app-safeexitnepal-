@@ -368,7 +368,6 @@ export default function ReportIncident(): React.JSX.Element {
           value={reporterName}
           onChangeText={setReporterName}
         />
-
         <Text style={styles.label}>Contact Number *</Text>
         <TextInput
           style={styles.input}
