@@ -63,7 +63,6 @@ export const FindShelters = ({ shelters = [] }: { shelters?: any }) => {
         closest = { ...shelter, distance: distance };
       }
     });
-
     if (closest) {
       const walkTimeMinutes = Math.round((closest.distance / 5) * 60);
 
