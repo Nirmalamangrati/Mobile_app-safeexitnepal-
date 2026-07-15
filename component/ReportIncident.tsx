@@ -355,7 +355,6 @@ export default function ReportIncident(): React.JSX.Element {
           onChangeText={setSuspectContact}
         />
       </View>
-
       {/* SECTION 3: Reporter Details */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
