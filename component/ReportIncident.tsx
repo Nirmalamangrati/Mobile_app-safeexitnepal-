@@ -346,7 +346,6 @@ export default function ReportIncident(): React.JSX.Element {
             </View>
           </View>
         </View>
-
         <Text style={styles.label}>Contact Number (If known)</Text>
         <TextInput
           style={styles.input}
