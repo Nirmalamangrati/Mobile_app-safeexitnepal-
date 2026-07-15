@@ -269,7 +269,6 @@ export default function ReportIncident(): React.JSX.Element {
             <Picker.Item label="🟢 Low (Minor Incident)" value="low" />
           </Picker>
         </View>
-
         <Text style={styles.label}>Incident Type *</Text>
         <View style={styles.pickerContainer}>
           <Picker
