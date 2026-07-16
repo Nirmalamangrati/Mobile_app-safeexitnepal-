@@ -387,7 +387,6 @@ export default function TrackTeamMap({
                             "N/A"}
                         </Text>
                       </View>
-
                       {/* 4. Contact Row */}
                       <View className="flex-row justify-between items-center mb-2.5">
                         <Text className="text-xs text-slate-400 font-medium">
