@@ -375,7 +375,6 @@ export default function ReportIncident(): React.JSX.Element {
           value={reporterContact}
           onChangeText={setReporterContact}
         />
-
         <View style={styles.toggleRow}>
           <Text style={styles.label}>Keep my identity anonymous</Text>
           <Switch
