@@ -396,7 +396,6 @@ export default function TrackTeamMap({
                           {item.contact || item.phone || "N/A"}
                         </Text>
                       </View>
-
                       {/* 5. Location Row */}
                       <View className="flex-row justify-between items-start">
                         <Text className="text-xs text-slate-400 font-medium w-1/3">
