@@ -350,7 +350,6 @@ export default function TrackTeamMap({
                           {item.name || item.title || "Untitled Team"}
                         </Text>
                       </View>
-
                       {/* 2. Status Row */}
                       <View className="flex-row justify-between items-center mb-2.5 border-t border-b border-slate-800/40 py-2">
                         <Text className="text-xs text-slate-400 font-medium">
