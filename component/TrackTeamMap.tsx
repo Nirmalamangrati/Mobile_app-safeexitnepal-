@@ -440,7 +440,6 @@ export default function TrackTeamMap({
       </View>
     );
   }
-
   return (
     <View className="flex-1 w-full h-full">
       <RenderMap />
