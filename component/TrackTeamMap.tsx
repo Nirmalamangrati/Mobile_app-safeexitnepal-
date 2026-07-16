@@ -374,7 +374,6 @@ export default function TrackTeamMap({
                           </Text>
                         </View>
                       </View>
-
                       {/* 3. Crew/Members Row */}
                       <View className="flex-row justify-between items-center mb-2.5">
                         <Text className="text-xs text-slate-400 font-medium">
