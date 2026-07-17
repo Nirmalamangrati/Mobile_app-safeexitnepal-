@@ -432,7 +432,6 @@ export default function ReportIncident(): React.JSX.Element {
           <Switch value={agreeTerms} onValueChange={setAgreeTerms} />
         </View>
       </View>
-
       {/* ACTION BUTTONS */}
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}> Submit Report</Text>
