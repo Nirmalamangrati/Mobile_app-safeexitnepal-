@@ -383,7 +383,6 @@ export default function ReportIncident(): React.JSX.Element {
           />
         </View>
       </View>
-
       {/* SECTION 5: File Attachment Box */}
       <View className="p-4 bg-slate-800 rounded-xl mb-4 w-full">
         <View className="mb-3">
