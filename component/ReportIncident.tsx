@@ -308,7 +308,6 @@ export default function ReportIncident(): React.JSX.Element {
         />
         <Text style={styles.charCount}>{description.length}/1000</Text>
       </View>
-
       {/* SECTION 2: Suspect Details */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
