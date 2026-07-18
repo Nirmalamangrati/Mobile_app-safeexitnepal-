@@ -124,7 +124,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </TouchableOpacity>
           </View>
         )}
-
         {/* Language Selection */}
         {currentView === "lang" && (
           <View className="w-full">
