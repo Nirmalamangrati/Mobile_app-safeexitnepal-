@@ -37,7 +37,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const changeLanguage = (lang: "en" | "ne") => {
     i18n.changeLanguage(lang);
   };
-
   return (
     <Modal
       animationType={animationType}
