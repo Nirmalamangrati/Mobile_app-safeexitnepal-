@@ -90,7 +90,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 value={isOfflineMode}
               />
             </View>
-
             {/* 2. language change*/}
             <TouchableOpacity
               className="flex-row justify-between items-center bg-slate-800/20  p-5 rounded-2xl"
