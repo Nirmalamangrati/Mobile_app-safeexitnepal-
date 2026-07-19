@@ -104,7 +104,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               </View>
               <MaterialIcons name="chevron-right" size={24} color="#475569" />
             </TouchableOpacity>
-
             {/* 3. password change */}
             <TouchableOpacity
               className="flex-row justify-between items-center bg-slate-800/20  p-5 rounded-2xl mt-4"
