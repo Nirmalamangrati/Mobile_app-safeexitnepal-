@@ -211,7 +211,6 @@ export default function TrackTeamMap({
       )}
     </MapView>
   );
-
   if (isMiniMap) {
     return (
       <View className="w-full bg-[#0f172a] rounded-2xl p-5 mb-4 border border-white/5 shadow-md">
