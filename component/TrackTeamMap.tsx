@@ -323,7 +323,6 @@ export default function TrackTeamMap({
                   </Text>
                 </TouchableOpacity>
               </View>
-
               {/* Content Scroll Wrapper */}
               <ScrollView
                 showsVerticalScrollIndicator={false}
