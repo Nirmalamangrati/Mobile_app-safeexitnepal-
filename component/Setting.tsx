@@ -10,7 +10,6 @@ import {
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "react-i18next";
 import "./i18n";
-
 interface SettingsModalProps {
   visible: boolean;
   onClose: () => void;
