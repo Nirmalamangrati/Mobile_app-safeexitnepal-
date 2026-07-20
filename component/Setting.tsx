@@ -15,7 +15,6 @@ interface SettingsModalProps {
   onClose: () => void;
   animationType?: "none" | "slide" | "fade";
 }
-
 const SettingsModal: React.FC<SettingsModalProps> = ({
   visible,
   onClose,
