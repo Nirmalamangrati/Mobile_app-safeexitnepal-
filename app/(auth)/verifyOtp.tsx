@@ -45,26 +45,43 @@ const VerifyOtpForm = () => {
   };
 
   const handleResendOtp = async () => {
+    if (!contact) {
+      return Alert.alert("App Error", "Contact information is missing.");
+    }
+
     setResending(true);
     try {
       const response = await fetch(`${BASE_URL}/api/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: contact, phone: contact }),
+        body: JSON.stringify({ email: contact }),
       });
 
-      if (response.ok) {
-        Alert.alert("Success", "A new OTP has been sent.");
-        setOtp(["", "", "", "", "", ""]);
-        setTimer(60);
-        if (inputs.current && inputs.current[0]) {
-          inputs.current[0].focus();
-        }
-      } else {
-        Alert.alert("Error", "Failed to resend OTP. Please try again.");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log("[Resend Failed Raw Text Output]:", errorText);
+        return Alert.alert("Server Error", `Status code: ${response.status}`);
       }
-    } catch (error) {
-      Alert.alert("Network Error", "Unable to reach server.");
+
+      const data = await response.json();
+
+      // BACKEND BYPASS CONFIGURATION LAYER (Alert Screen Bypass Engine)
+      if (data.otp) {
+        // Alert nadekhaikana backend bata aako testing code lai layout input box maa automatically pathaune:
+        const otpArray = data.otp.split("");
+        setOtp(otpArray);
+      } else {
+        // Yadi production backend le real SMS gateway successfully trigger garyo bhane matra success popup dinxa
+        Alert.alert(
+          "Success",
+          "A new OTP verification code has been dispatched.",
+        );
+      }
+
+      setTimer(60);
+    } catch (error: any) {
+      console.error("[Resend OTP Network Exception]:", error);
+      Alert.alert("Network Error", error?.message || "Unable to reach server.");
     } finally {
       setResending(false);
     }
