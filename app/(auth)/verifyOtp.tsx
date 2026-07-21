@@ -62,9 +62,7 @@ const VerifyOtpForm = () => {
         console.log("[Resend Failed Raw Text Output]:", errorText);
         return Alert.alert("Server Error", `Status code: ${response.status}`);
       }
-
       const data = await response.json();
-
       // BACKEND BYPASS CONFIGURATION LAYER (Alert Screen Bypass Engine)
       if (data.otp) {
         // Alert nadekhaikana backend bata aako testing code lai layout input box maa automatically pathaune:
