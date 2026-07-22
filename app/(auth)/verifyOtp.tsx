@@ -93,7 +93,6 @@ const VerifyOtpForm = () => {
     const fullOtp = otp.join("");
     //ALGORITHM: DETERMINISTIC LENGTH VALIDATION (REGEX)
     const otpRegex = /^[0-9]{6}$/;
-
     if (!otpRegex.test(fullOtp)) {
       return Alert.alert(
         "Invalid Input",
