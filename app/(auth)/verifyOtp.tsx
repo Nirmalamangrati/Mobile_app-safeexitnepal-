@@ -56,7 +56,6 @@ const VerifyOtpForm = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: contact }),
       });
-
       if (!response.ok) {
         const errorText = await response.text();
         console.log("[Resend Failed Raw Text Output]:", errorText);
