@@ -75,7 +75,6 @@ const VerifyOtpForm = () => {
           "A new OTP verification code has been dispatched.",
         );
       }
-
       setTimer(60);
     } catch (error: any) {
       console.error("[Resend OTP Network Exception]:", error);
