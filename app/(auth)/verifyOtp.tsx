@@ -83,7 +83,6 @@ const VerifyOtpForm = () => {
       setResending(false);
     }
   };
-
   const handleVerify = async () => {
     if (timer === 0) {
       return Alert.alert(
