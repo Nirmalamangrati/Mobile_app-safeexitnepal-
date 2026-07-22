@@ -99,7 +99,6 @@ const VerifyOtpForm = () => {
         "Please enter a valid 6-digit OTP code.",
       );
     }
-
     setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/api/auth/verify-otp`, {
