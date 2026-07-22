@@ -106,7 +106,6 @@ const VerifyOtpForm = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: contact, phone: contact, otp: fullOtp }),
       });
-
       const data = await response.json();
 
       if (response.ok) {
