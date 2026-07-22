@@ -107,7 +107,6 @@ const VerifyOtpForm = () => {
         body: JSON.stringify({ email: contact, phone: contact, otp: fullOtp }),
       });
       const data = await response.json();
-
       if (response.ok) {
         await AsyncStorage.setItem("userToken", data.token);
         await AsyncStorage.setItem("userData", JSON.stringify(data.user));
