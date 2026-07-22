@@ -90,7 +90,6 @@ const VerifyOtpForm = () => {
         "The 1-minute window has closed. Please click 'Resend OTP' to get a new code.",
       );
     }
-
     const fullOtp = otp.join("");
     //ALGORITHM: DETERMINISTIC LENGTH VALIDATION (REGEX)
     const otpRegex = /^[0-9]{6}$/;
