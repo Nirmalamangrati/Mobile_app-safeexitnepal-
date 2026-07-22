@@ -120,7 +120,6 @@ const VerifyOtpForm = () => {
       setLoading(false);
     }
   };
-
   return (
     <View className="flex-1 bg-[#0f172a] justify-center p-6">
       {/* Back to Login Button */}
