@@ -48,7 +48,6 @@ const VerifyOtpForm = () => {
     if (!contact) {
       return Alert.alert("App Error", "Contact information is missing.");
     }
-
     setResending(true);
     try {
       const response = await fetch(`${BASE_URL}/api/auth/resend-otp`, {
