@@ -137,7 +137,6 @@ const VerifyOtpForm = () => {
           </Text>
         </Text>
       </View>
-
       {/* Grid containing 6 distinct input elements */}
       <View className="flex-row justify-between mb-4 px-2">
         {otp.map((digit, idx) => (
