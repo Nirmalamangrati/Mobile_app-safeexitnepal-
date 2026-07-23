@@ -127,7 +127,6 @@ const VerifyOtpForm = () => {
         <ArrowLeft color="#94a3b8" size={18} />
         <Text className="text-gray-400 ml-2 font-medium">Back</Text>
       </TouchableOpacity>
-
       <View className="mb-8 items-center">
         <Text className="text-white text-3xl font-bold tracking-tight">
           Enter Code
