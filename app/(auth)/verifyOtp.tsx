@@ -32,7 +32,6 @@ const VerifyOtpForm = () => {
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
-
     if (text && index < 5) {
       inputs.current[index + 1].focus();
     }
