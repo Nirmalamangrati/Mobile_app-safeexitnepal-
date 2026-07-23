@@ -42,7 +42,6 @@ const VerifyOtpForm = () => {
       inputs.current[index - 1].focus();
     }
   };
-
   const handleResendOtp = async () => {
     if (!contact) {
       return Alert.alert("App Error", "Contact information is missing.");
