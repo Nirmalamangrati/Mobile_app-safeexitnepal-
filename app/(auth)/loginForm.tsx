@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Mail, Lock, ArrowRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
-const BASE_URL = "https://rummage-tucking-dividend.ngrok-free.dev";
+const BASE_URL = "https://safeexitnepal-backend-2.onrender.com";
 // 1. ALGORITHM: LEVENSHTEIN DISTANCE (STRING SIMILARITY)
 const getLevenshteinDistance = (a: string, b: string) => {
   if (!a || !b) return Math.abs((a || "").length - (b || "").length);
