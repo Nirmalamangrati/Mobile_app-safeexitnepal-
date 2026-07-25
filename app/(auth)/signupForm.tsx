@@ -52,7 +52,6 @@ const SafeExitSignup = () => {
       phone: string;
       primary: boolean;
     }[],
-
     safetyInfo: {
       bloodGroup: "",
       medicalConditions: "",
