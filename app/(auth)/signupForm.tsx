@@ -59,7 +59,6 @@ const SafeExitSignup = () => {
       address: "",
       hospital: "",
     },
-
     permissions: {
       location: true,
       notifications: true,
