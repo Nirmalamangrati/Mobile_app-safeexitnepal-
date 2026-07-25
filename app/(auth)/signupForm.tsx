@@ -46,7 +46,6 @@ const SafeExitSignup = () => {
     confirmPassword: "",
     gender: "Male",
     dob: "",
-
     emergencyContacts: [] as {
       name: string;
       relationship: string;
