@@ -128,8 +128,6 @@ const SafeExitSignup = () => {
       emergencyContacts: filtered,
     }));
   };
-
-  // Next Step
   const handleNext = () => {
     // STEP 1 VALIDATION
     if (step === 1) {
