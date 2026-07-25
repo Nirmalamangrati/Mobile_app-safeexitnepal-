@@ -67,10 +67,6 @@ const LoginForm = () => {
         });
         const data = await response.json();
         if (response.ok) {
-          // Alert.alert(
-          //   "Success",
-          //   "OTP has been sent to your contact. Please check.",
-          // );
           router.push({
             pathname: "/(auth)/verifyOtp",
             params: { contact: contact },
