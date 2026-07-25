@@ -66,7 +66,6 @@ const SafeExitSignup = () => {
       phone: true,
       background: true,
     },
-
     agreed: false,
   });
   // Toggle Permission
