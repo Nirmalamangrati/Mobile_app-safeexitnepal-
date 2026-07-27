@@ -216,7 +216,6 @@ const SafeExitSignup = () => {
               Stay Safe. Stay Connected.
             </Text>
           </View>
-
           {/* STEP BAR */}
           <View className="flex-row items-center justify-between px-8 py-6">
             {[1, 2, 3, 4, 5].map((i) => (
