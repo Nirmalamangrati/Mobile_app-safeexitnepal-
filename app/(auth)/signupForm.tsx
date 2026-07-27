@@ -161,7 +161,6 @@ const SafeExitSignup = () => {
     }
     setStep((prev) => prev + 1);
   };
-
   // Back Step
   const handleBack = () => {
     setStep((prev) => (prev > 1 ? prev - 1 : prev));
