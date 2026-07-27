@@ -270,7 +270,6 @@ const SafeExitSignup = () => {
                     className="flex-1 ml-3 text-sm text-gray-800"
                   />
                 </View>
-
                 {/* PHONE */}
                 <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 mb-3">
                   <Phone size={18} color="#94a3b8" />
