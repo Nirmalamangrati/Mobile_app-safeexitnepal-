@@ -166,7 +166,6 @@ const SafeExitSignup = () => {
   const handleBack = () => {
     setStep((prev) => (prev > 1 ? prev - 1 : prev));
   };
-
   // Submit Signup
   const handleSignupSubmit = async () => {
     if (!formData.agreed) {
