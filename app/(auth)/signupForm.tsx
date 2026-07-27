@@ -198,7 +198,6 @@ const SafeExitSignup = () => {
       Alert.alert("Connection Error", "Unable to connect to the server.");
     }
   };
-
   return (
     <View className="flex-1 bg-white">
       <Modal visible={isModalVisible} animationType="slide">
