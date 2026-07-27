@@ -211,7 +211,6 @@ const SafeExitSignup = () => {
             <Text className="text-2xl font-black text-red-700">
               SafeExit Nepal
             </Text>
-
             <Text className="text-[11px] text-gray-400 mt-1 tracking-widest uppercase">
               Stay Safe. Stay Connected.
             </Text>
