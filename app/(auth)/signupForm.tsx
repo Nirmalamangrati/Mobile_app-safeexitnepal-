@@ -255,7 +255,6 @@ const SafeExitSignup = () => {
                 <Text className="text-center text-gray-400 text-xs mt-1 mb-7">
                   Enter your personal information.
                 </Text>
-
                 {/* NAME */}
                 <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 mb-3">
                   <User size={18} color="#94a3b8" />
